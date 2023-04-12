@@ -1,4 +1,5 @@
 publish/
+/.vs
 *.suo
 *.user
 *.Resharper
