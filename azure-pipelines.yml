@@ -1,0 +1,94 @@
+name: $(Build.BuildId)
+
+trigger:
+- master
+- qa
+- on-going-dev
+
+variables:
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+  ${{ if eq(variables['Build.SourceBranchName'], 'on-going-dev') }}: 
+    repository: dev/$(Build.Repository.Name)
+  ${{ if eq(variables['Build.SourceBranchName'], 'qa') }}: 
+    repository: qa/$(Build.Repository.Name)
+  ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+    repository: qa/$(Build.Repository.Name)
+
+jobs:
+- job: buildapp
+  displayName: "Build App"
+  pool:
+   vmImage: 'windows-latest'
+
+  steps:
+    - task: NuGetToolInstaller@1
+      displayName: Install Nuget
+
+    - script: choco install sql-server-express
+      displayName: Install Localdb
+
+    - task: UseDotNet@2
+      displayName: 'Use dotnet'
+      inputs:
+        version: '6.0.x'
+        includePreviewVersions: true
+    
+    - task: NuGetCommand@2
+      displayName: Restore
+      inputs:
+        command: 'restore'
+        restoreSolution: '**/*.sln'
+        feedsToUse: 'select'
+        vstsFeed: '********TBD********/********TBD********'
+      
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish'
+      inputs:
+        command: publish
+        publishWebProjects: True
+        arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+        zipAfterPublish: False
+        
+    - task: DotNetCoreCLI@2
+      displayName: 'Test'
+      inputs:
+        command: 'test'
+        projects: '**/*Tests/*.csproj'
+        arguments: '--configuration $(buildConfiguration)'
+    
+    - task: PublishTestResults@2
+      inputs:
+       testResultsFormat: 'JUnit'
+       testResultsFiles: '**/TEST-*.xml'
+   
+    - task: PublishBuildArtifacts@1
+      displayName: Publish
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: app
+        publishLocation: 'Container'
+
+- job: builddocker
+  displayName: "Build Docker"
+  pool:
+   vmImage: 'ubuntu-latest'
+  dependsOn: buildapp
+  
+  steps:
+    - task: DownloadPipelineArtifact@2
+      displayName: Download Artifact
+      inputs:
+        artifactName: app
+        targetPath: '$(Pipeline.Workspace)'
+
+    - task: Docker@2
+      displayName: Docker build and push
+      inputs:
+        containerRegistry: 'acr-connection'
+        repository: $(repository)
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        buildContext: '$(Pipeline.Workspace)'
+        tags: $(Build.BuildId)
