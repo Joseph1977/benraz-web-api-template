@@ -1,0 +1,14 @@
+name: $(Build.BuildId)
+trigger:
+- on-going-dev
+- master
+resources:
+  repositories:
+    - repository: devops
+      type: git
+      name: benraz-devops-cloud-platform
+extends:
+  template: ./pipelines/main-ci-pipeline.yml@devops
+  parameters:
+    DockerfilePath: $(System.DefaultWorkingDirectory)/Dockerfile
+    ReleaseName: "authorization-server"

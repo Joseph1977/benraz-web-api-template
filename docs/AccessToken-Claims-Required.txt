@@ -1,0 +1,9 @@
+this document include all the claim required in each access token for each service:
+-----------
+From XXXSERVICEXXX:
+
+Need Roles:
+xxx  (for xxx)
+
+Need Claims:
+xxx  (for xxx)
