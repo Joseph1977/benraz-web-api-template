@@ -8,6 +8,7 @@ using Benraz.Infrastructure.Web.Filters;
 using Swashbuckle.AspNetCore.Filters;
 using System.IO;
 using System.Reflection;
+using Asp.Versioning.ApiExplorer;
 
 namespace _MicroserviceTemplate_.WebApi.Extensions
 {

@@ -7,12 +7,9 @@ using _MicroserviceTemplate_.EF.Services;
 using _MicroserviceTemplate_.WebApi.Authorization;
 using _MicroserviceTemplate_.WebApi.Controllers;
 using _MicroserviceTemplate_.WebApi.Extensions;
-using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +24,9 @@ using Benraz.Infrastructure.Web.Authorization;
 using Benraz.Infrastructure.Web.Filters;
 using System;
 using System.Reflection;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace _MicroserviceTemplate_.WebApi
 {
@@ -175,8 +175,13 @@ namespace _MicroserviceTemplate_.WebApi
                 .AddJwtBearer(options =>
                 {
                     var serviceProvider = services.BuildServiceProvider();
-
                     var tokenValidationService = serviceProvider.GetRequiredService<ITokenValidationService>();
+
+                    // Switch to using TokenHandlers
+                    options.TokenHandlers.Clear();  // Clear existing handlers if any
+                    options.TokenHandlers.Add(new JwtSecurityTokenHandler());  // Add JwtSecurityTokenHandler for handling JWTs
+
+                    // Configure the TokenValidationParameters to specify how tokens should be validated
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ClockSkew = TimeSpan.FromMinutes(5),
@@ -186,11 +191,12 @@ namespace _MicroserviceTemplate_.WebApi
                         ValidateIssuer = true,
                         IssuerValidator = tokenValidationService.IssuerValidator,
 
+                        // Include additional validation settings as needed
                     };
 
-                    var tokenValidator = serviceProvider.GetRequiredService<TokenValidator>();
-                    options.SecurityTokenValidators.Clear();
-                    options.SecurityTokenValidators.Add(tokenValidator);
+                    options.Audience = Configuration["Jwt:Audience"];
+                    options.Authority = Configuration["Jwt:Authority"];
+
                 });
 
             services
@@ -220,18 +226,31 @@ namespace _MicroserviceTemplate_.WebApi
 
         private static void AddVersioning(IServiceCollection services)
         {
-            services.AddVersionedApiExplorer(options =>
+            // Add API versioning          
+            var apiVersioningBuilder = services.AddApiVersioning(options =>
             {
-                options.GroupNameFormat = "'v'VVV";
-                options.SubstituteApiVersionInUrl = true;
-            });
-
-            services.AddApiVersioning(options =>
-            {
+                options.ReportApiVersions = true;
                 options.DefaultApiVersion = new ApiVersion(1, 0);
                 options.AssumeDefaultVersionWhenUnspecified = true;
-                options.ReportApiVersions = true;
-            });
+                // Use whatever reader you want
+                //options.ApiVersionReader = new UrlSegmentApiVersionReader();
+                options.ApiVersionReader = ApiVersionReader.Combine(new UrlSegmentApiVersionReader(),
+                                                new HeaderApiVersionReader("x-api-version"),
+                                                new MediaTypeApiVersionReader("x-api-version"));
+            }); // Nuget Package: Asp.Versioning.Mvc
+
+            // Add versioned API explorer
+            apiVersioningBuilder.AddApiExplorer(options =>
+            {
+                // add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
+                // note: the specified format code will format the version as "'v'major[.minor][-status]"
+                options.GroupNameFormat = "'v'VVV";
+
+                // note: this option is only necessary when versioning by url segment. the SubstitutionFormat
+                // can also be used to control the format of the API version in route templates
+                options.SubstituteApiVersionInUrl = true;
+            }); // Nuget Package: Asp.Versioning.Mvc.ApiExplorer
+
         }
 
         private void UseDatabaseMigrations(IApplicationBuilder app)
