@@ -76,13 +76,18 @@ namespace _MicroserviceTemplate_.WebApi
             var logFolder = config.GetValue<string>("General:LogFolder");
             InternalLogger.LogFile = Path.Combine(logFolder, "nlog-internal.log");
 
-            var logFactory = NLogBuilder.ConfigureNLog("nlog.config");
-            logFactory.Configuration.Variables["logFolder"] = logFolder;
+            var logFactory = NLog.LogManager.Setup()
+                .LoadConfigurationFromFile("nlog.config") // Load configuration from nlog.config file
+                .LoadConfiguration(configBuilder =>
+                {
+                    var config = configBuilder.Configuration;
+                    config.Variables["logFolder"] = logFolder;
+                })
+                .GetCurrentClassLogger();
 
-            var logger = logFactory.GetCurrentClassLogger();
-            logger.Info("Starting application...");
+            logFactory.Info("Starting application...");
 
-            return logger;
+            return logFactory;
         }
 
         private static string GetSqlServerConnectionString(IConfigurationBuilder builder)
