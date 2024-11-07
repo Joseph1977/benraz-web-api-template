@@ -1,13 +1,16 @@
 # Benraz Microservice Template
+
 This solution represents a template that could be used for easily prepare a new microservice with many features already integrated and ready to use.
 
 ## How to use
+
 1. Copy the code from "./src" folder to a destination folder (like {NewProject}/src).
 2. Run Rename.ps1 with new project name as a ProjectName parameter (powershell.exe -executionpolicy bypass -file Rename.ps1 -ProjectName "NewProject1").
 
 And that's it, now you have new fully functioning microservice, and it is ready to be extended.
 
 ## Features
+
 * Ready to use solution structure;
 * Entity Framework Core with database context, mapping configurations, repositories and database migration service;
 * Settings for microserviceservice configuration - ability to setup microservice via database;
@@ -22,6 +25,7 @@ And that's it, now you have new fully functioning microservice, and it is ready 
 * Base EF repository tests and Web API integration tests with NUnit, Fluent Assertions and Moq plugged-in.
 
 ## Structure
+
 * \_MicroserviceTemplate\_.Domain. Business entities and services.
 * \_MicroserviceTemplate\_.Domain.Tests. Unit tests for business services and business logic.
 * \_MicroserviceTemplate\_.EF. Data access layer implementation with Entity Framework Core. Contains:
@@ -36,3 +40,24 @@ And that's it, now you have new fully functioning microservice, and it is ready 
   * Config that prepares server, HTTP client and database context;
   * StartupStub that extends Startup of the server under test and mocks an authorization mechanism to unbind the server under test from Benraz Authorization server;
   * ControllerTestsBase which could be used a base class for all controllers tests.
+
+## Database
+
+if *ConnectionStrings* variable null, empty or not exist, the service will not initiate the EF, migration and if any call require access to DB, exception will be thrown, but if call other stuff such as IsAlive() endpoint, the service will be loaded and the endpoint call will response correctly.
+
+## Environment Variables
+
+At first we are using the appsetting.json, while also some of the setting are located in the setting table in DB.
+we can't add secrets to appsetting.json thus, those secret was in that table.
+
+The best practices to save secrets are to save them in Key vault, additionally managing settings in database is a bit awakeward, thus we added the following mechanisem:
+
+By default the service will use the environment variables, means, if there is no **appsetting.json** file or UseEnvironmentVariables variable in the **appsetting.json** file.
+
+When **appsetting.json** file includes *UseEnvironmentVariables=false* then the service will use the appsetting.json as the source of the settings variables.
+
+### Secrets
+
+1. We have added .env  folder which includes the environment variables (.env file) for each region (environment-region: dev-use1 = usa est1)
+2. Secrets variables include values with "__" in the beginning and end of the Key name in the keyVault, example DB_PASS=\_\_KEY_DB_PASS\_\_.  
+3. Pipeline will handle these secrets, pipeline before inject the value of DB_PASS in the container environment secrets, it first will pull the secret value from keyVault, the key name in this case is KEY_DB_PASS.
