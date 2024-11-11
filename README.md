@@ -45,6 +45,12 @@ And that's it, now you have new fully functioning microservice, and it is ready 
 
 if *ConnectionStrings* variable null, empty or not exist, the service will not initiate the EF, migration and if any call require access to DB, exception will be thrown, but if call other stuff such as IsAlive() endpoint, the service will be loaded and the endpoint call will response correctly.
 
+## Templates
+
+1. src-msdb : a project with entity framwark, setting table for configuration, .env for secrets (devops pipeline) and appsetting.json
+2. scr-env (msdb): env for all configurations, no appsetting.json, DB for job, and one table as example (remove setting table and controller, and add myTable with the controller (CURD)
+3. scr-env (postgressdb):   -TBD
+
 ## Environment Variables
 
 At first we are using the appsetting.json, while also some of the setting are located in the setting table in DB.
@@ -59,5 +65,5 @@ When **appsetting.json** file includes *UseEnvironmentVariables=false* then the 
 ### Secrets
 
 1. We have added .env  folder which includes the environment variables (.env file) for each region (environment-region: dev-use1 = usa est1)
-2. Secrets variables include values with "__" in the beginning and end of the Key name in the keyVault, example DB_PASS=\_\_KEY_DB_PASS\_\_.  
+2. Secrets variables include values with "__" in the beginning and end of the Key name in the keyVault, example DB_PASS=\_\_KEY_DB_PASS\_\_.
 3. Pipeline will handle these secrets, pipeline before inject the value of DB_PASS in the container environment secrets, it first will pull the secret value from keyVault, the key name in this case is KEY_DB_PASS.

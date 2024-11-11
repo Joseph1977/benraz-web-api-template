@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="6.12.0" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.8" />
+    <PackageReference Include="nunit" Version="4.2.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\_MicroserviceTemplate_.Domain\_MicroserviceTemplate_.Domain.csproj" />
+    <ProjectReference Include="..\_MicroserviceTemplate_.EF\_MicroserviceTemplate_.EF.csproj" />
+    <ProjectReference Include="..\_MicroserviceTemplate_.WebApi\_MicroserviceTemplate_.WebApi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
