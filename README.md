@@ -49,7 +49,7 @@ if *ConnectionStrings* variable null, empty or not exist, the service will not i
 
 1. src-msdb : a project with entity framwark, setting table for configuration, .env for secrets (devops pipeline) and appsetting.json
 2. scr-env (msdb): env for all configurations, no appsetting.json, DB for job, and one table as example (remove setting table and controller, and add myTable with the controller (CURD)
-3. scr-env (postgressdb):   -TBD
+3. scr-env (postgressdb):  -TBD
 
 ## Environment Variables
 
