@@ -1,4 +1,4 @@
-using _MicroserviceTemplate_.Domain.Settings;
+using _MicroserviceTemplate_.Domain.MyTables;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -10,9 +10,9 @@ namespace _MicroserviceTemplate_.EF
     public class _MicroserviceTemplate_DbContext : DbContext
     {
         /// <summary>
-        /// Settings entries.
+        /// My tables.
         /// </summary>
-        public DbSet<SettingsEntry> SettingsEntries { get; set; }
+        public DbSet<MyTable> MyTables { get; set; }
 
         /// <summary>
         /// Creates context.

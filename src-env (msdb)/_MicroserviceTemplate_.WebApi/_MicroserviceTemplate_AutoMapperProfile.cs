@@ -1,5 +1,5 @@
-using _MicroserviceTemplate_.Domain.Settings;
-using _MicroserviceTemplate_.WebApi.Models.Settings;
+using _MicroserviceTemplate_.Domain.MyTables;
+using _MicroserviceTemplate_.WebApi.Models.MyTables;
 using AutoMapper;
 using Benraz.Infrastructure.Common.Paging;
 using System;
@@ -11,7 +11,7 @@ namespace _MicroserviceTemplate_.WebApi
         public _MicroserviceTemplate_AutoMapperProfile()
         {
             CreateCommonMaps();
-            CreateSettingsMaps();
+            CreateMyTablesMaps();
         }
 
         private void CreateCommonMaps()
@@ -19,13 +19,13 @@ namespace _MicroserviceTemplate_.WebApi
             CreateMap(typeof(Page<>), typeof(Page<>));
         }
 
-        private void CreateSettingsMaps()
+        private void CreateMyTablesMaps()
         {
-            CreateMap<SettingsEntry, SettingsEntryViewModel>()
-                .ForMember(x => x.CreateTimeUtc, o => o.MapFrom(x => SpecifyUtc(x.CreateTimeUtc)))
-                .ForMember(x => x.UpdateTimeUtc, o => o.MapFrom(x => SpecifyUtc(x.UpdateTimeUtc)));
-            CreateMap<AddSettingsEntryViewModel, SettingsEntry>();
-            CreateMap<ChangeSettingsEntryViewModel, SettingsEntry>();
+            CreateMap<MyTable, MyTableViewModel>()
+                            .ForMember(x => x.CreateTimeUtc, o => o.MapFrom(x => SpecifyUtc(x.CreateTimeUtc)))
+                            .ForMember(x => x.UpdateTimeUtc, o => o.MapFrom(x => SpecifyUtc(x.UpdateTimeUtc)));
+            CreateMap<AddMyTableViewModel, MyTable>();
+            CreateMap<ChangeMyTableViewModel, MyTable>();
         }
 
         private static DateTime? SpecifyUtc(DateTime? dateTime)

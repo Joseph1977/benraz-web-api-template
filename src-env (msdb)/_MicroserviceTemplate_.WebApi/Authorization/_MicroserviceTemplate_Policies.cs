@@ -6,24 +6,24 @@ namespace _MicroserviceTemplate_.WebApi.Authorization
     public static class _MicroserviceTemplate_Policies
     {
         /// <summary>
-        /// Read settings policy.
+        /// Read my tables policy.
         /// </summary>
-        public const string SETTINGS_READ = "settings-read";
+        public const string MYTABLES_READ = "mytables-read";
 
         /// <summary>
-        /// Add settings policy.
+        /// Add my tables policy.
         /// </summary>
-        public const string SETTINGS_ADD = "settings-add";
+        public const string MYTABLES_ADD = "mytables-add";
 
         /// <summary>
-        /// Update settings policy.
+        /// Update my tables policy.
         /// </summary>
-        public const string SETTINGS_UPDATE = "settings-update";
+        public const string MYTABLES_UPDATE = "mytables-update";
 
         /// <summary>
-        /// Delete settings policy.
+        /// Delete my tables policy.
         /// </summary>
-        public const string SETTINGS_DELETE = "settings-delete";
+        public const string MYTABLES_DELETE = "mytables-delete";
 
         /// <summary>
         /// Execute job policy.

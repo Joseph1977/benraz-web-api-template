@@ -1,9 +1,9 @@
-namespace _MicroserviceTemplate_.WebApi.Models.Settings
+﻿namespace _MicroserviceTemplate_.WebApi.Models.MyTables
 {
     /// <summary>
-    /// Change settings entry view model.
+    /// Change my table view model.
     /// </summary>
-    public class ChangeSettingsEntryViewModel
+    public class ChangeMyTableViewModel
     {
         /// <summary>
         /// Value.

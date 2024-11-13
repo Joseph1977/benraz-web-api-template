@@ -1,30 +1,30 @@
-using Benraz.Infrastructure.Common.EntityBase;
+﻿using Benraz.Infrastructure.Common.EntityBase;
 using System.Collections.Generic;
 
-namespace _MicroserviceTemplate_.Domain.Settings
+namespace _MicroserviceTemplate_.Domain.MyTables
 {
     /// <summary>
-    /// Settings entry.
+    /// My table
     /// </summary>
-    public class SettingsEntry : AggregateRootBase<string>
+    public class MyTable : AggregateRootBase<string>
     {
         /// <summary>
-        /// Settings entry value.
+        /// Value.
         /// </summary>
         public string Value { get; set; }
 
         /// <summary>
-        /// Settings description.
+        /// Description.
         /// </summary>
         public string Description { get; set; }
 
         /// <summary>
-        /// Creates settings entry.
+        /// Creates my table.
         /// </summary>
         /// <param name="id">Identifier.</param>
         /// <param name="value">Value.</param>
         /// <param name="description">Description.</param>
-        public SettingsEntry(string id, string value, string description = null)
+        public MyTable(string id, string value, string description = null)
             : this()
         {
             Id = id;
@@ -33,19 +33,19 @@ namespace _MicroserviceTemplate_.Domain.Settings
         }
 
         /// <summary>
-        /// Creates settings entry.
+        /// Creates my table.
         /// </summary>
-        public SettingsEntry()
+        public MyTable()
         {
         }
 
         /// <summary>
-        /// Returns default settings entries.
+        /// Returns default my table entries.
         /// </summary>
-        /// <returns>Default settings entries.</returns>
-        public static IEnumerable<SettingsEntry> GetDefaultValues()
+        /// <returns>Default my table entries.</returns>
+        public static IEnumerable<MyTable> GetDefaultValues()
         {
-            var defaultValues = new List<SettingsEntry>();
+            var defaultValues = new List<MyTable>();
 
             return defaultValues;
         }

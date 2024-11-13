@@ -1,12 +1,21 @@
 using _MicroserviceTemplate_.Domain.Authorization;
 using _MicroserviceTemplate_.Domain.Jobs;
-using _MicroserviceTemplate_.Domain.Settings;
+using _MicroserviceTemplate_.Domain.MyTables;
 using _MicroserviceTemplate_.EF;
 using _MicroserviceTemplate_.EF.Repositories;
 using _MicroserviceTemplate_.EF.Services;
 using _MicroserviceTemplate_.WebApi.Authorization;
 using _MicroserviceTemplate_.WebApi.Controllers;
 using _MicroserviceTemplate_.WebApi.Extensions;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
+using Benraz.Infrastructure.Authorization.Tokens;
+using Benraz.Infrastructure.Common.AccessControl;
+using Benraz.Infrastructure.Common.BackgroundQueue;
+using Benraz.Infrastructure.Common.DataRedundancy;
+using Benraz.Infrastructure.Gateways.BenrazAuthorization.Auth;
+using Benraz.Infrastructure.Web.Authorization;
+using Benraz.Infrastructure.Web.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -15,18 +24,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Benraz.Infrastructure.Authorization.Tokens;
-using Benraz.Infrastructure.Common.AccessControl;
-using Benraz.Infrastructure.Common.BackgroundQueue;
-using Benraz.Infrastructure.Common.DataRedundancy;
-using Benraz.Infrastructure.Gateways.BenrazAuthorization.Auth;
-using Benraz.Infrastructure.Web.Authorization;
-using Benraz.Infrastructure.Web.Filters;
 using System;
-using System.Reflection;
-using Asp.Versioning;
-using Asp.Versioning.ApiExplorer;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 
 namespace _MicroserviceTemplate_.WebApi
 {
@@ -123,11 +123,11 @@ namespace _MicroserviceTemplate_.WebApi
 
         private void ConfigureSqlServerContext(IServiceCollection services)
         {
-            string connectionString = Configuration.GetConnectionString("_MicroserviceTemplate_");
+            string connectionString = Configuration.GetValue<string>("ConnectionStrings");
             if (IsInjectDbCredentialsToConnectionString())
             {
                 connectionString +=
-                    $";User Id={Environment.GetEnvironmentVariable("ASPNETCORE_DB_USERNAME")};Password={Environment.GetEnvironmentVariable("ASPNETCORE_DB_PASSWORD")}";
+                    $";User Id={Configuration.GetValue<string>("AspNetCoreDbUserName")};Password={Configuration.GetValue<string>("AspNetCoreDbPassword")}";
             }
 
             services.AddDbContext<_MicroserviceTemplate_DbContext>(options =>
@@ -145,7 +145,7 @@ namespace _MicroserviceTemplate_.WebApi
 
             services.AddTransient<IDbMigrationService, _MicroserviceTemplate_DbMigrationService>();
 
-            services.AddTransient<ISettingsEntriesRepository, SettingsEntriesRepository>();
+            services.AddTransient<IMyTablesRepository, MyTablesRepository>();
 
             services.AddTransient<IEmptyRepeatableJobsService, EmptyRepeatableJobsService>();
 
@@ -203,17 +203,17 @@ namespace _MicroserviceTemplate_.WebApi
                 .AddAuthorization(options =>
                 {
                     options.AddClaimsPolicy(
-                        _MicroserviceTemplate_Policies.SETTINGS_READ,
-                        _MicroserviceTemplate_Claims.SETTINGS_READ);
+                        _MicroserviceTemplate_Policies.MYTABLES_READ,
+                        _MicroserviceTemplate_Claims.MYTABLES_READ);
                     options.AddClaimsPolicy(
-                        _MicroserviceTemplate_Policies.SETTINGS_ADD,
-                        _MicroserviceTemplate_Claims.SETTINGS_ADD);
+                        _MicroserviceTemplate_Policies.MYTABLES_ADD,
+                        _MicroserviceTemplate_Claims.MYTABLES_ADD);
                     options.AddClaimsPolicy(
-                        _MicroserviceTemplate_Policies.SETTINGS_UPDATE,
-                        _MicroserviceTemplate_Claims.SETTINGS_UPDATE);
+                        _MicroserviceTemplate_Policies.MYTABLES_UPDATE,
+                        _MicroserviceTemplate_Claims.MYTABLES_UPDATE);
                     options.AddClaimsPolicy(
-                        _MicroserviceTemplate_Policies.SETTINGS_DELETE,
-                        _MicroserviceTemplate_Claims.SETTINGS_DELETE);
+                        _MicroserviceTemplate_Policies.MYTABLES_DELETE,
+                        _MicroserviceTemplate_Claims.MYTABLES_DELETE);
 
                     options.AddPolicy(
                         _MicroserviceTemplate_Policies.JOB_EXECUTE,

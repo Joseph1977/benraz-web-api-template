@@ -1,19 +1,19 @@
-using _MicroserviceTemplate_.Domain.Settings;
-using _MicroserviceTemplate_.WebApi.Models.Settings;
+﻿using _MicroserviceTemplate_.Domain.MyTables;
+using _MicroserviceTemplate_.WebApi.Models.MyTables;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Benraz.Infrastructure.Common.Http;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace _MicroserviceTemplate_.WebApi.IntegrationTests
 {
     [TestFixture]
-    public class SettingsControllerTests : ControllerTestsBase
+    public class MyTableControllerTests : ControllerTestsBase
     {
         [Test]
         public async Task CanGetAllEntitiesAsync()
@@ -21,9 +21,9 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
             await AddDefaultEntityAsync();
             await AddDefaultEntityAsync();
 
-            var responseContentString = await HttpClient.GetStringAsync("/v1/Settings");
+            var responseContentString = await HttpClient.GetStringAsync("/v1/MyTable");
             var viewModels =
-                JsonConvert.DeserializeObject<IEnumerable<SettingsEntryViewModel>>(responseContentString);
+                JsonConvert.DeserializeObject<IEnumerable<MyTableViewModel>>(responseContentString);
 
             viewModels.Should().NotBeNull();
             viewModels.Should().HaveCount(2);
@@ -34,8 +34,8 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
         {
             var entity = await AddDefaultEntityAsync();
 
-            var responseContentString = await HttpClient.GetStringAsync($"/v1/Settings/{entity.Id}");
-            var viewModel = JsonConvert.DeserializeObject<SettingsEntryViewModel>(responseContentString);
+            var responseContentString = await HttpClient.GetStringAsync($"/v1/MyTable/{entity.Id}");
+            var viewModel = JsonConvert.DeserializeObject<MyTableViewModel>(responseContentString);
 
             viewModel.Should().NotBeNull();
         }
@@ -43,13 +43,13 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
         [Test]
         public async Task CanAddEntityAsync()
         {
-            var viewModel = new AddSettingsEntryViewModel
+            var viewModel = new AddMyTableViewModel
             {
                 Id = "Id001",
                 Value = "Value001",
                 Description = "Description001"
             };
-            var response = await HttpClient.PostAsJsonAsync("/v1/Settings", viewModel);
+            var response = await HttpClient.PostAsJsonAsync("/v1/MyTable", viewModel);
             var responseContentString = await response.Content.ReadAsStringAsync();
 
             responseContentString.Should().NotBeNullOrEmpty();
@@ -61,11 +61,11 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
         {
             var entity = await AddDefaultEntityAsync();
 
-            var viewModel = new ChangeSettingsEntryViewModel
+            var viewModel = new ChangeMyTableViewModel
             {
                 Value = "Value001"
             };
-            var response = await HttpClient.PutAsJsonAsync($"/v1/Settings/{entity.Id}", viewModel);
+            var response = await HttpClient.PutAsJsonAsync($"/v1/MyTable/{entity.Id}", viewModel);
 
             response.StatusCode.Should().Be(HttpStatusCode.NoContent);
             GetDbSet().Should().HaveCount(1);
@@ -76,7 +76,7 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
         {
             var entity = await AddDefaultEntityAsync();
 
-            var response = await HttpClient.DeleteAsync($"/v1/Settings/{entity.Id}");
+            var response = await HttpClient.DeleteAsync($"/v1/MyTable/{entity.Id}");
 
             response.StatusCode.Should().Be(HttpStatusCode.NoContent);
             GetDbSet().Should().HaveCount(0);
@@ -90,12 +90,12 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
             await DBContext.SaveChangesAsync();
         }
 
-        protected DbSet<SettingsEntry> GetDbSet()
+        protected DbSet<MyTable> GetDbSet()
         {
-            return DBContext.SettingsEntries;
+            return DBContext.MyTables;
         }
 
-        private async Task<SettingsEntry> AddDefaultEntityAsync()
+        private async Task<MyTable> AddDefaultEntityAsync()
         {
             var entity = CreateDefaultEntity();
             GetDbSet().Add(entity);
@@ -104,9 +104,9 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
             return entity;
         }
 
-        private SettingsEntry CreateDefaultEntity()
+        private MyTable CreateDefaultEntity()
         {
-            return new SettingsEntry
+            return new MyTable
             {
                 Id = Guid.NewGuid().ToString(),
                 Value = "Value001",

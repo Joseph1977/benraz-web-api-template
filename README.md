@@ -62,6 +62,8 @@ By default the service will use the environment variables, means, if there is no
 
 When **appsetting.json** file includes *UseEnvironmentVariables=false* then the service will use the appsetting.json as the source of the settings variables.
 
+All environment variables should be in camelCase.
+
 ### Secrets
 
 1. We have added .env  folder which includes the environment variables (.env file) for each region (environment-region: dev-use1 = usa est1)

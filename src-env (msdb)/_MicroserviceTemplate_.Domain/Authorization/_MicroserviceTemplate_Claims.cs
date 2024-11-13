@@ -6,24 +6,24 @@ namespace _MicroserviceTemplate_.Domain.Authorization
     public static class _MicroserviceTemplate_Claims
     {
         /// <summary>
-        /// Read settings claim.
+        /// Read my table claim.
         /// </summary>
-        public const string SETTINGS_READ = "_MicroserviceTemplate_-settings-read";
+        public const string MYTABLES_READ = "_MicroserviceTemplate_-mytables-read";
 
         /// <summary>
-        /// Add settings claim.
+        /// Add my table claim.
         /// </summary>
-        public const string SETTINGS_ADD = "_MicroserviceTemplate_-settings-add";
+        public const string MYTABLES_ADD = "_MicroserviceTemplate_-mytables-add";
 
         /// <summary>
-        /// Update settings claim.
+        /// Update my table claim.
         /// </summary>
-        public const string SETTINGS_UPDATE = "_MicroserviceTemplate_-settings-update";
+        public const string MYTABLES_UPDATE = "_MicroserviceTemplate_-mytables-update";
 
         /// <summary>
-        /// Delete settings claim.
+        /// Delete my table claim.
         /// </summary>
-        public const string SETTINGS_DELETE = "_MicroserviceTemplate_-settings-delete";
+        public const string MYTABLES_DELETE = "_MicroserviceTemplate_-mytables-delete";
 
         /// <summary>
         /// Execute job claim.

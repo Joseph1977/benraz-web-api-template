@@ -1,7 +1,7 @@
 using _MicroserviceTemplate_.WebApi.Configuration;
 using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -28,11 +28,11 @@ namespace _MicroserviceTemplate_.WebApi
             Logger logger = null;
             try
             {
-                var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+                var environment = Environment.GetEnvironmentVariable("AspNetCore_Environment");
                 var config = new ConfigurationBuilder()
                     .SetBasePath(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
-                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+                    .AddEnvironmentVariables()
+                    .Add(new CustomEnvironmentVariableConfigurationSource())
                     .Build();
 
                 logger = InitLogger(config);
@@ -57,11 +57,6 @@ namespace _MicroserviceTemplate_.WebApi
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
             return WebHost.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration(builder =>
-                {
-                    var connectionString = GetSqlServerConnectionString(builder);
-                    builder.AddDatabaseConfiguration(options => options.UseSqlServer(connectionString));
-                })
                 .UseStartup<Startup>()
                 .ConfigureLogging(logging => logging.ClearProviders())
                 .UseNLog(new NLogAspNetCoreOptions
@@ -88,19 +83,6 @@ namespace _MicroserviceTemplate_.WebApi
             logFactory.Info("Starting application...");
 
             return logFactory;
-        }
-
-        private static string GetSqlServerConnectionString(IConfigurationBuilder builder)
-        {
-            var connectionString = builder.Build().GetConnectionString("_MicroserviceTemplate_");
-            var isInjectDbCredentialsToConnectionString = builder.Build().GetValue<bool>("InjectDBCredentialFromEnvironment");
-            if (!isInjectDbCredentialsToConnectionString) return connectionString;
-            var userName = Environment.GetEnvironmentVariable("ASPNETCORE_DB_USERNAME");
-            var password = Environment.GetEnvironmentVariable("ASPNETCORE_DB_PASSWORD");
-            connectionString +=
-                $";User Id={userName};Password={password}";
-
-            return connectionString;
         }
     }
 }

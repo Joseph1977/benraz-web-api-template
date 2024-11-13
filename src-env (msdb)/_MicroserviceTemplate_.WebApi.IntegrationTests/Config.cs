@@ -1,4 +1,5 @@
 using _MicroserviceTemplate_.EF;
+using _MicroserviceTemplate_.WebApi.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,9 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
         {
             _configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("Properties/EnvironmentVariables.json", optional: true)
+                .AddEnvironmentVariables()
+                .Add(new CustomEnvironmentVariableConfigurationSource())
                 .Build();
 
             DBContext = CreateDbContext();
@@ -40,12 +43,24 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
 
         public static _MicroserviceTemplate_DbContext CreateDbContext()
         {
+            string connectionString = _configuration.GetValue<string>("ConnectionStrings");
+            if (IsInjectDbCredentialsToConnectionString())
+            {
+                connectionString +=
+                    $";User Id={_configuration.GetValue<string>("AspNetCoreDbUserName")};Password={_configuration.GetValue<string>("AspNetCoreDbPassword")}";
+            }
+
             var dbContextOptions = new DbContextOptionsBuilder<_MicroserviceTemplate_DbContext>()
                 .EnableSensitiveDataLogging()
-                .UseSqlServer(_configuration.GetConnectionString("_MicroserviceTemplate_"))
+                .UseSqlServer(connectionString)
                 .Options;
 
             return new _MicroserviceTemplate_DbContext(dbContextOptions);
+        }
+
+        private static bool IsInjectDbCredentialsToConnectionString()
+        {
+            return _configuration.GetValue<bool>("InjectDBCredentialFromEnvironment");
         }
     }
 }

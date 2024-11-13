@@ -1,11 +1,11 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace _MicroserviceTemplate_.WebApi.Models.Settings
+namespace _MicroserviceTemplate_.WebApi.Models.MyTables
 {
     /// <summary>
-    /// Add settings entry view model.
+    /// Add my table view model.
     /// </summary>
-    public class AddSettingsEntryViewModel
+    public class AddMyTableViewModel
     {
         /// <summary>
         /// Identifier.

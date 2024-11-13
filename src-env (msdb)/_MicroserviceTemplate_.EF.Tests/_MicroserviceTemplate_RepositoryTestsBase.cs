@@ -1,9 +1,9 @@
+using Benraz.Infrastructure.Common.EntityBase;
+using Benraz.Infrastructure.Common.Repositories;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
-using Benraz.Infrastructure.Common.EntityBase;
-using Benraz.Infrastructure.Common.Repositories;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -115,11 +115,18 @@ namespace _MicroserviceTemplate_.EF.Tests
         {
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("Properties/EnvironmentVariables.json", optional: true)
                 .Build();
 
+            string connectionString = configuration.GetValue<string>("ConnectionStrings");
+            if (configuration.GetValue<bool>("InjectDBCredentialFromEnvironment"))
+            {
+                connectionString +=
+                    $";User Id={configuration.GetValue<string>("AspNetCoreDbUserName")};Password={configuration.GetValue<string>("AspNetCoreDbPassword")}";
+            }
+
             var builder = new DbContextOptionsBuilder<_MicroserviceTemplate_DbContext>();
-            builder.UseSqlServer(configuration.GetConnectionString("_MicroserviceTemplate_"));
+            builder.UseSqlServer(connectionString);
 
             return builder;
         }

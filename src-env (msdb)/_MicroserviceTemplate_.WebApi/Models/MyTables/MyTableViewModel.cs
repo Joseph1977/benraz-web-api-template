@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 
-namespace _MicroserviceTemplate_.WebApi.Models.Settings
+namespace _MicroserviceTemplate_.WebApi.Models.MyTables
 {
     /// <summary>
-    /// Settings entry view model.
+    /// My table view model.
     /// </summary>
-    public class SettingsEntryViewModel
+    public class MyTableViewModel
     {
         /// <summary>
         /// Identifier.
