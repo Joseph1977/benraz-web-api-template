@@ -45,7 +45,6 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
         {
             var viewModel = new AddMyTableViewModel
             {
-                Id = "Id001",
                 Value = "Value001",
                 Description = "Description001"
             };
@@ -108,7 +107,7 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
         {
             return new MyTable
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid(),
                 Value = "Value001",
                 Description = "Description001"
             };

@@ -15,7 +15,7 @@
       "environmentVariables": {
         "AspNetCore_Environment": "Development",
         "ConnectionStrings": "Data Source=(localdb)\\mssqllocaldb;Integrated Security=SSPI;Initial Catalog=Benraz._MicroserviceTemplate_",
-        
+
         "Audience": "_MicroserviceTemplate_",
 
         "General_LogFolder": "./Logs",
@@ -41,9 +41,6 @@
         "Jwt_Audience": "",
         "Jwt_Authority": "",
 
-        "AccessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyb2xlIjoidGVzdCJ9.-I0pOAoVASxAkkupXlue8npTy_LBPua_ln_V6Tq_-_8",
-        "BenrazAuthGateway_BaseUrl": "http://localhost:60341",
-
         "AspNetCoreDbUserName": "__DB_USERNAME__",
         "AspNetCoreDbPassword": "__DB_PASSWORD__"
       }
@@ -54,7 +51,7 @@
       "environmentVariables": {
         "AspNetCore_Environment": "Development",
         "ConnectionStrings": "Data Source=(localdb)\\mssqllocaldb;Integrated Security=SSPI;Initial Catalog=Benraz._MicroserviceTemplate_",
-        
+
         "Audience": "_MicroserviceTemplate_",
 
         "General_LogFolder": "./Logs",

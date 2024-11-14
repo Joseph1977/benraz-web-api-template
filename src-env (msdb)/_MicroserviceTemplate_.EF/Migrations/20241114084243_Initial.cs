@@ -17,7 +17,7 @@ namespace _MicroserviceTemplate_.EF.Migrations
                 name: "MyTables",
                 columns: table => new
                 {
-                    MyTableId = table.Column<string>(type: "nvarchar(500)", nullable: false),
+                    MyTableId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateTimeUtc = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getutcdate()"),
@@ -33,9 +33,9 @@ namespace _MicroserviceTemplate_.EF.Migrations
                 columns: new[] { "MyTableId", "CreateTimeUtc", "Description", "UpdateTimeUtc", "Value" },
                 values: new object[,]
                 {
-                    { "Operation:Add", new DateTime(2024, 11, 13, 14, 30, 44, 687, DateTimeKind.Utc).AddTicks(2282), "Add a new record.", new DateTime(2024, 11, 13, 14, 30, 44, 687, DateTimeKind.Utc).AddTicks(2282), "Add" },
-                    { "Operation:Edit", new DateTime(2024, 11, 13, 14, 30, 44, 687, DateTimeKind.Utc).AddTicks(2286), "Edit existing record.", new DateTime(2024, 11, 13, 14, 30, 44, 687, DateTimeKind.Utc).AddTicks(2286), "Edit" },
-                    { "Operation:Remove", new DateTime(2024, 11, 13, 14, 30, 44, 687, DateTimeKind.Utc).AddTicks(2287), "Remove existing record.", new DateTime(2024, 11, 13, 14, 30, 44, 687, DateTimeKind.Utc).AddTicks(2287), "Remove" }
+                    { new Guid("8ec418ae-69cf-44f0-a1f3-ba26142b3563"), new DateTime(2024, 11, 14, 8, 42, 41, 861, DateTimeKind.Utc).AddTicks(4777), "Remove existing record.", new DateTime(2024, 11, 14, 8, 42, 41, 861, DateTimeKind.Utc).AddTicks(4777), "Remove" },
+                    { new Guid("c209d3b5-6482-439a-be59-3471c170cae9"), new DateTime(2024, 11, 14, 8, 42, 41, 861, DateTimeKind.Utc).AddTicks(4769), "Add a new record.", new DateTime(2024, 11, 14, 8, 42, 41, 861, DateTimeKind.Utc).AddTicks(4769), "Add" },
+                    { new Guid("e5ecdbee-834f-42e7-a25d-b0aa00d3fcf1"), new DateTime(2024, 11, 14, 8, 42, 41, 861, DateTimeKind.Utc).AddTicks(4775), "Edit existing record.", new DateTime(2024, 11, 14, 8, 42, 41, 861, DateTimeKind.Utc).AddTicks(4775), "Edit" }
                 });
         }
 

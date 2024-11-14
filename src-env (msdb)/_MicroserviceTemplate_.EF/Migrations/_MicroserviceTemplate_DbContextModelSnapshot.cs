@@ -24,8 +24,9 @@ namespace _MicroserviceTemplate_.EF.Migrations
 
             modelBuilder.Entity("_MicroserviceTemplate_.Domain.MyTables.MyTable", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(500)")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("MyTableId");
 
                     b.Property<DateTime>("CreateTimeUtc")
@@ -51,26 +52,26 @@ namespace _MicroserviceTemplate_.EF.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "Operation:Add",
-                            CreateTimeUtc = new DateTime(2024, 11, 13, 14, 30, 44, 687, DateTimeKind.Utc).AddTicks(2282),
+                            Id = new Guid("c209d3b5-6482-439a-be59-3471c170cae9"),
+                            CreateTimeUtc = new DateTime(2024, 11, 14, 8, 42, 41, 861, DateTimeKind.Utc).AddTicks(4769),
                             Description = "Add a new record.",
-                            UpdateTimeUtc = new DateTime(2024, 11, 13, 14, 30, 44, 687, DateTimeKind.Utc).AddTicks(2282),
+                            UpdateTimeUtc = new DateTime(2024, 11, 14, 8, 42, 41, 861, DateTimeKind.Utc).AddTicks(4769),
                             Value = "Add"
                         },
                         new
                         {
-                            Id = "Operation:Edit",
-                            CreateTimeUtc = new DateTime(2024, 11, 13, 14, 30, 44, 687, DateTimeKind.Utc).AddTicks(2286),
+                            Id = new Guid("e5ecdbee-834f-42e7-a25d-b0aa00d3fcf1"),
+                            CreateTimeUtc = new DateTime(2024, 11, 14, 8, 42, 41, 861, DateTimeKind.Utc).AddTicks(4775),
                             Description = "Edit existing record.",
-                            UpdateTimeUtc = new DateTime(2024, 11, 13, 14, 30, 44, 687, DateTimeKind.Utc).AddTicks(2286),
+                            UpdateTimeUtc = new DateTime(2024, 11, 14, 8, 42, 41, 861, DateTimeKind.Utc).AddTicks(4775),
                             Value = "Edit"
                         },
                         new
                         {
-                            Id = "Operation:Remove",
-                            CreateTimeUtc = new DateTime(2024, 11, 13, 14, 30, 44, 687, DateTimeKind.Utc).AddTicks(2287),
+                            Id = new Guid("8ec418ae-69cf-44f0-a1f3-ba26142b3563"),
+                            CreateTimeUtc = new DateTime(2024, 11, 14, 8, 42, 41, 861, DateTimeKind.Utc).AddTicks(4777),
                             Description = "Remove existing record.",
-                            UpdateTimeUtc = new DateTime(2024, 11, 13, 14, 30, 44, 687, DateTimeKind.Utc).AddTicks(2287),
+                            UpdateTimeUtc = new DateTime(2024, 11, 14, 8, 42, 41, 861, DateTimeKind.Utc).AddTicks(4777),
                             Value = "Remove"
                         });
                 });

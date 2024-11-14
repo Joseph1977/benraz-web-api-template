@@ -12,7 +12,7 @@ namespace _MicroserviceTemplate_.EF.Configurations
 
             builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.Id).HasColumnName("MyTableId").HasColumnType("nvarchar(500)");
+            builder.Property(x => x.Id).HasColumnName("MyTableId").HasColumnType("uniqueidentifier");
             builder.Property(x => x.CreateTimeUtc).HasDefaultValueSql("getutcdate()");
             builder.Property(x => x.UpdateTimeUtc).HasDefaultValueSql("getutcdate()");
         }

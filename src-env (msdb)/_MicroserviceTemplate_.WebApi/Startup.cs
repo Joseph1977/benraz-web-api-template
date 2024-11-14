@@ -124,17 +124,22 @@ namespace _MicroserviceTemplate_.WebApi
         private void ConfigureSqlServerContext(IServiceCollection services)
         {
             string connectionString = Configuration.GetValue<string>("ConnectionStrings");
-            if (IsInjectDbCredentialsToConnectionString())
+            if (!String.IsNullOrWhiteSpace(connectionString))
             {
-                connectionString +=
-                    $";User Id={Configuration.GetValue<string>("AspNetCoreDbUserName")};Password={Configuration.GetValue<string>("AspNetCoreDbPassword")}";
-            }
+                if (IsInjectDbCredentialsToConnectionString())
+                {
+                    connectionString +=
+                        $";User Id={Configuration.GetValue<string>("AspNetCoreDbUserName")};Password={Configuration.GetValue<string>("AspNetCoreDbPassword")}";
+                }
 
-            services.AddDbContext<_MicroserviceTemplate_DbContext>(options =>
-                options.UseSqlServer(
-                    connectionString,
-                    o => o.EnableRetryOnFailure(3)
-                ));
+                services.AddDbContext<_MicroserviceTemplate_DbContext>(options =>
+                    options.UseSqlServer(
+                        connectionString,
+                        o => o.EnableRetryOnFailure(3)
+                    ));
+            }
+            else
+                services.AddDbContext<_MicroserviceTemplate_DbContext>();
         }
 
         private void AddServices(IServiceCollection services)
@@ -255,10 +260,14 @@ namespace _MicroserviceTemplate_.WebApi
 
         private void UseDatabaseMigrations(IApplicationBuilder app)
         {
-            using (var scope = app.ApplicationServices.CreateScope())
+            string connectionString = Configuration.GetValue<string>("ConnectionStrings");
+            if (!String.IsNullOrWhiteSpace(connectionString))
             {
-                scope.ServiceProvider.GetRequiredService<IDbMigrationService>().MigrateAsync().Wait();
-            }
+                using (var scope = app.ApplicationServices.CreateScope())
+                {
+                    scope.ServiceProvider.GetRequiredService<IDbMigrationService>().MigrateAsync().Wait();
+                }
+            }  
         }
 
         private bool IsInjectDbCredentialsToConnectionString()

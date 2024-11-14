@@ -6,6 +6,7 @@ using Benraz.Infrastructure.Web.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -41,7 +42,7 @@ namespace _MicroserviceTemplate_.WebApi.Controllers
         [Authorize(_MicroserviceTemplate_Policies.MYTABLES_READ)]
         [ProducesResponseType(typeof(MyTableViewModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByIdAsync([FromRoute] string id)
+        public async Task<IActionResult> GetByIdAsync([FromRoute] Guid id)
         {
             var myTableEntry = await _myTablesRepository.GetByIdAsync(id);
             if (myTableEntry == null)
@@ -85,13 +86,8 @@ namespace _MicroserviceTemplate_.WebApi.Controllers
                 return BadRequest();
             }
 
-            var dbMyTableEntry = await _myTablesRepository.GetByIdAsync(viewModel.Id);
-            if (dbMyTableEntry != null)
-            {
-                return BadRequest("My table entry with the same key already exists.");
-            }
-
             var myTableEntry = _mapper.Map<MyTable>(viewModel);
+            myTableEntry.Id = Guid.NewGuid();
             await _myTablesRepository.AddAsync(myTableEntry);
 
             return Ok(myTableEntry.Id);
@@ -110,7 +106,7 @@ namespace _MicroserviceTemplate_.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ServiceFilter(typeof(DRFilterAttribute))]
         public async Task<IActionResult> ChangeAsync(
-            [FromRoute] string id, [FromBody] ChangeMyTableViewModel viewModel)
+            [FromRoute] Guid id, [FromBody] ChangeMyTableViewModel viewModel)
         {
             if (viewModel == null)
             {
@@ -139,7 +135,7 @@ namespace _MicroserviceTemplate_.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ServiceFilter(typeof(DRFilterAttribute))]
-        public async Task<IActionResult> DeleteAsync([FromRoute] string id)
+        public async Task<IActionResult> DeleteAsync([FromRoute] Guid id)
         {
             var myTableEntry = await _myTablesRepository.GetByIdAsync(id);
             if (myTableEntry == null)

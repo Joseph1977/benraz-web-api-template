@@ -8,14 +8,9 @@ namespace _MicroserviceTemplate_.WebApi.Models.MyTables
     public class AddMyTableViewModel
     {
         /// <summary>
-        /// Identifier.
-        /// </summary>
-        [Required]
-        public string Id { get; set; }
-
-        /// <summary>
         /// Value.
         /// </summary>
+        [Required]
         public string Value { get; set; }
 
         /// <summary>

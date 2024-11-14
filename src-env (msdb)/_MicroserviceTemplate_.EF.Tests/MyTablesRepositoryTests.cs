@@ -1,18 +1,19 @@
 ﻿using _MicroserviceTemplate_.Domain.MyTables;
 using _MicroserviceTemplate_.EF.Repositories;
 using NUnit.Framework;
+using System;
 
 namespace _MicroserviceTemplate_.EF.Tests
 {
     [TestFixture]
     public class MyTablesRepositoryTests :
-        _MicroserviceTemplate_RepositoryTestsBase<string, MyTable, MyTablesRepository>
+        _MicroserviceTemplate_RepositoryTestsBase<Guid, MyTable, MyTablesRepository>
     {
         protected override MyTable CreateDefaultEntity()
         {
             return new MyTable
             {
-                Id = "MyTableId001",
+                Id = Guid.NewGuid(),
                 Value = "MyTableValue001",
                 Description = "MyTableDescription001"
             };

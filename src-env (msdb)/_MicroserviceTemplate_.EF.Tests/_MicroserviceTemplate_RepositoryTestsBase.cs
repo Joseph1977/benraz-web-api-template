@@ -115,19 +115,20 @@ namespace _MicroserviceTemplate_.EF.Tests
         {
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("Properties/EnvironmentVariables.json", optional: true)
+                .AddJsonFile("Properties/EnvironmentVariables.json", optional: true, reloadOnChange: true)
                 .Build();
 
-            string connectionString = configuration.GetValue<string>("ConnectionStrings");
-            if (configuration.GetValue<bool>("InjectDBCredentialFromEnvironment"))
-            {
-                connectionString +=
-                    $";User Id={configuration.GetValue<string>("AspNetCoreDbUserName")};Password={configuration.GetValue<string>("AspNetCoreDbPassword")}";
-            }
-
             var builder = new DbContextOptionsBuilder<_MicroserviceTemplate_DbContext>();
-            builder.UseSqlServer(connectionString);
-
+            string connectionString = configuration.GetValue<string>("ConnectionStrings");
+            if (!String.IsNullOrWhiteSpace(connectionString))
+            {
+                if (configuration.GetValue<bool>("InjectDBCredentialFromEnvironment"))
+                {
+                    connectionString +=
+                        $";User Id={configuration.GetValue<string>("AspNetCoreDbUserName")};Password={configuration.GetValue<string>("AspNetCoreDbPassword")}";
+                }
+                builder.UseSqlServer(connectionString);
+            }
             return builder;
         }
     }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -24,7 +25,7 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
         {
             _configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("Properties/EnvironmentVariables.json", optional: true)
+                .AddJsonFile("Properties/EnvironmentVariables.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Add(new CustomEnvironmentVariableConfigurationSource())
                 .Build();
@@ -43,19 +44,19 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
 
         public static _MicroserviceTemplate_DbContext CreateDbContext()
         {
+            var builder = new DbContextOptionsBuilder<_MicroserviceTemplate_DbContext>().EnableSensitiveDataLogging();
             string connectionString = _configuration.GetValue<string>("ConnectionStrings");
-            if (IsInjectDbCredentialsToConnectionString())
+            if (!String.IsNullOrWhiteSpace(connectionString))
             {
-                connectionString +=
-                    $";User Id={_configuration.GetValue<string>("AspNetCoreDbUserName")};Password={_configuration.GetValue<string>("AspNetCoreDbPassword")}";
+                if (IsInjectDbCredentialsToConnectionString())
+                {
+                    connectionString +=
+                        $";User Id={_configuration.GetValue<string>("AspNetCoreDbUserName")};Password={_configuration.GetValue<string>("AspNetCoreDbPassword")}";
+                }
+
+                builder.UseSqlServer(connectionString); 
             }
-
-            var dbContextOptions = new DbContextOptionsBuilder<_MicroserviceTemplate_DbContext>()
-                .EnableSensitiveDataLogging()
-                .UseSqlServer(connectionString)
-                .Options;
-
-            return new _MicroserviceTemplate_DbContext(dbContextOptions);
+            return new _MicroserviceTemplate_DbContext(builder.Options);
         }
 
         private static bool IsInjectDbCredentialsToConnectionString()

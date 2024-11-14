@@ -10,7 +10,7 @@ namespace _MicroserviceTemplate_.WebApi.Models.MyTables
         /// <summary>
         /// Identifier.
         /// </summary>
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// Value.

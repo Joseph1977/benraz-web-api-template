@@ -1,4 +1,5 @@
 ﻿using Benraz.Infrastructure.Common.EntityBase;
+using System;
 using System.Collections.Generic;
 
 namespace _MicroserviceTemplate_.Domain.MyTables
@@ -6,7 +7,7 @@ namespace _MicroserviceTemplate_.Domain.MyTables
     /// <summary>
     /// My table
     /// </summary>
-    public class MyTable : AggregateRootBase<string>
+    public class MyTable : AggregateRootBase<Guid>
     {
         /// <summary>
         /// Value.
@@ -24,7 +25,7 @@ namespace _MicroserviceTemplate_.Domain.MyTables
         /// <param name="id">Identifier.</param>
         /// <param name="value">Value.</param>
         /// <param name="description">Description.</param>
-        public MyTable(string id, string value, string description = null)
+        public MyTable(Guid id, string value, string description = null)
             : this()
         {
             Id = id;

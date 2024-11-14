@@ -1,5 +1,6 @@
 ﻿using _MicroserviceTemplate_.Domain.MyTables;
 using Benraz.Infrastructure.EF;
+using System;
 
 namespace _MicroserviceTemplate_.EF.Repositories
 {
@@ -7,7 +8,7 @@ namespace _MicroserviceTemplate_.EF.Repositories
     /// My tables repository.
     /// </summary>
     public class MyTablesRepository :
-        RepositoryBase<string, MyTable, _MicroserviceTemplate_DbContext>,
+        RepositoryBase<Guid, MyTable, _MicroserviceTemplate_DbContext>,
         IMyTablesRepository
     {
         /// <summary>
