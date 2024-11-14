@@ -11,7 +11,7 @@
 
   "AllowedHosts": "*",
   "DisableSwagger": "false",
-  "InjectDBCredentialFromEnvironment": "true",
+  "InjectDBCredentialFromEnvironment": "false",
   "SwaggerBasePath": "_microservicetemplate_-server",
   "EnablesApplicationInsights": "false",
 

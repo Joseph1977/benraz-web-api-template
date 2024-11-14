@@ -1,6 +1,6 @@
 {
   "AspNetCore_Environment": "Development",
-  "InjectDBCredentialFromEnvironment": "true",
+  "InjectDBCredentialFromEnvironment": "false",
   "ConnectionStrings": "Data Source=(localdb)\\mssqllocaldb;Integrated Security=SSPI;Initial Catalog=Benraz._MicroserviceTemplate_.Test",
 
   "AspNetCoreDbUserName": "__DB_USERNAME__",
