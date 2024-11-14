@@ -123,9 +123,9 @@ namespace _MicroserviceTemplate_.WebApi
 
         private void ConfigureSqlServerContext(IServiceCollection services)
         {
-            string connectionString = Configuration.GetValue<string>("ConnectionStrings");
-            if (!String.IsNullOrWhiteSpace(connectionString))
+            if (IsCheckConnectionStringExists())
             {
+                string connectionString = Configuration.GetValue<string>("ConnectionStrings");
                 if (IsInjectDbCredentialsToConnectionString())
                 {
                     connectionString +=
@@ -260,8 +260,7 @@ namespace _MicroserviceTemplate_.WebApi
 
         private void UseDatabaseMigrations(IApplicationBuilder app)
         {
-            string connectionString = Configuration.GetValue<string>("ConnectionStrings");
-            if (!String.IsNullOrWhiteSpace(connectionString))
+            if (IsCheckConnectionStringExists())
             {
                 using (var scope = app.ApplicationServices.CreateScope())
                 {
@@ -273,6 +272,17 @@ namespace _MicroserviceTemplate_.WebApi
         private bool IsInjectDbCredentialsToConnectionString()
         {
             return Configuration.GetValue<bool>("InjectDBCredentialFromEnvironment");
+        }
+
+        private bool IsCheckConnectionStringExists()
+        {
+            bool isExists = true;
+            string connectionString = Configuration.GetValue<string>("ConnectionStrings");
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                isExists = false;
+            }
+            return isExists;
         }
     }
 }

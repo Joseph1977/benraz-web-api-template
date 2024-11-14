@@ -15,17 +15,34 @@ namespace _MicroserviceTemplate_.EF.Tests
         where TEntity : class, IAggregateRoot<TKey>
         where TRepository : IRepository<TKey, TEntity>
     {
+        protected IConfiguration configuration;
+
         [SetUp]
         public virtual async Task SetUpAsync()
         {
-            await CreateContext().Database.MigrateAsync();
-            await ClearDataAsync();
+            configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("Properties/EnvironmentVariables.json", optional: true, reloadOnChange: true)
+            .Build();
+
+            if (!IsCheckConnectionStringExists())
+            {
+                Assert.Ignore("Connection string is missing. Skipping test.");
+            }
+            else
+            {
+                await CreateContext().Database.MigrateAsync();
+                await ClearDataAsync();
+            }
         }
 
         [TearDown]
         public virtual async Task TearDownAsync()
         {
-            await ClearDataAsync();
+            if (IsCheckConnectionStringExists())
+            {
+                await ClearDataAsync();
+            }
         }
 
         [Test]
@@ -113,15 +130,10 @@ namespace _MicroserviceTemplate_.EF.Tests
 
         protected DbContextOptionsBuilder<_MicroserviceTemplate_DbContext> CreateContextBuilder()
         {
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("Properties/EnvironmentVariables.json", optional: true, reloadOnChange: true)
-                .Build();
-
             var builder = new DbContextOptionsBuilder<_MicroserviceTemplate_DbContext>();
-            string connectionString = configuration.GetValue<string>("ConnectionStrings");
-            if (!String.IsNullOrWhiteSpace(connectionString))
+            if (IsCheckConnectionStringExists())
             {
+                string connectionString = configuration.GetValue<string>("ConnectionStrings");
                 if (configuration.GetValue<bool>("InjectDBCredentialFromEnvironment"))
                 {
                     connectionString +=
@@ -130,6 +142,23 @@ namespace _MicroserviceTemplate_.EF.Tests
                 builder.UseSqlServer(connectionString);
             }
             return builder;
+        }
+
+        public bool IsCheckConnectionStringExists()
+        {
+            if (configuration.GetValue<bool>("SkipDbTestIfNoConnectionString"))
+            {
+                return false;
+            }
+            else
+            {
+                string connectionString = configuration.GetValue<string>("ConnectionStrings");
+                if (string.IsNullOrWhiteSpace(connectionString))
+                {
+                    return false;
+                }
+                return true;
+            }
         }
     }
 }

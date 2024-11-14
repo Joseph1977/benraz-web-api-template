@@ -9,5 +9,10 @@
         /// Value.
         /// </summary>
         public string Value { get; set; }
+
+        /// <summary>
+        /// Description.
+        /// </summary>
+        public string Description { get; set; }
     }
 }

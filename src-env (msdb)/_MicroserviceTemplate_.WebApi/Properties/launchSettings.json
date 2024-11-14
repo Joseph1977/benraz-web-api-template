@@ -15,7 +15,7 @@
       "environmentVariables": {
         "AspNetCore_Environment": "Development",
         "ConnectionStrings": "Data Source=(localdb)\\mssqllocaldb;Integrated Security=SSPI;Initial Catalog=Benraz._MicroserviceTemplate_",
-        
+
         "Audience": "_MicroserviceTemplate_",
 
         "General_LogFolder": "./Logs",

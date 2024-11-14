@@ -62,7 +62,8 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
 
             var viewModel = new ChangeMyTableViewModel
             {
-                Value = "Value001"
+                Value = "Value001",
+                Description = "Description001"
             };
             var response = await HttpClient.PutAsJsonAsync($"/v1/MyTable/{entity.Id}", viewModel);
 

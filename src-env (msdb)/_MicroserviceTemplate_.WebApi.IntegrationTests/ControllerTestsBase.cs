@@ -17,13 +17,27 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
             HttpClient = Config.HttpClient;
             DBContext = Config.DBContext;
 
-            await ClearDataAsync();
+            var _connectionString = Config.IsCheckConnectionStringExists();
+
+            if (!_connectionString)
+            {
+                Assert.Ignore("Connection string is missing. Skipping test.");
+            }
+            else
+            {
+                await ClearDataAsync();
+            }
         }
 
         [TearDown]
         public virtual async Task TearDownAsync()
         {
-            await ClearDataAsync();
+            var _connectionString = Config.IsCheckConnectionStringExists();
+
+            if (_connectionString)
+            {
+                await ClearDataAsync();
+            }
         }
 
         protected virtual Task ClearDataAsync()

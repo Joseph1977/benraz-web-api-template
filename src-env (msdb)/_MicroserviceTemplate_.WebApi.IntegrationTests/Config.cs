@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
-using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -45,9 +44,10 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
         public static _MicroserviceTemplate_DbContext CreateDbContext()
         {
             var builder = new DbContextOptionsBuilder<_MicroserviceTemplate_DbContext>().EnableSensitiveDataLogging();
-            string connectionString = _configuration.GetValue<string>("ConnectionStrings");
-            if (!String.IsNullOrWhiteSpace(connectionString))
+            
+            if (IsCheckConnectionStringExists())
             {
+                string connectionString = _configuration.GetValue<string>("ConnectionStrings");
                 if (IsInjectDbCredentialsToConnectionString())
                 {
                     connectionString +=
@@ -62,6 +62,23 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
         private static bool IsInjectDbCredentialsToConnectionString()
         {
             return _configuration.GetValue<bool>("InjectDBCredentialFromEnvironment");
+        }
+
+        public static bool IsCheckConnectionStringExists()
+        {
+            if (_configuration.GetValue<bool>("SkipDbTestIfNoConnectionString"))
+            {
+                return false;
+            }
+            else
+            {
+                string connectionString = _configuration.GetValue<string>("ConnectionStrings");
+                if (string.IsNullOrWhiteSpace(connectionString))
+                {
+                    return false;
+                }
+                return true;
+            }
         }
     }
 }
