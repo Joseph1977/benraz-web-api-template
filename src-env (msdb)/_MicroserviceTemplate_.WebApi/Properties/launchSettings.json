@@ -1,0 +1,57 @@
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:57886",
+      "sslPort": 0
+    }
+  },
+  "profiles": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "AspNetCore_Environment": "Development",
+        "ConnectionStrings": "Data Source=(localdb)\\mssqllocaldb;Integrated Security=SSPI;Initial Catalog=Benraz._MicroserviceTemplate_",
+
+        "Audience": "_MicroserviceTemplate_",
+
+        "General_LogFolder": "./Logs",
+        "Logging_LogLevel_Default": "Information",
+        "Logging_LogLevel_Microsoft": "Warning",
+        "Logging_LogLevel_Microsoft.Hosting.Lifetime": "Information",
+
+        "AllowedHosts": "*",
+        "DisableSwagger": "false",
+        "InjectDBCredentialFromEnvironment": "false",
+        "SwaggerBasePath": "_microservicetemplate_-server",
+        "EnablesApplicationInsights": "false",
+
+        "Region": "USE1",
+        "Environment": "DEV",
+        "ServiceName": "_microservicetemplate_-server",
+        "Service": "MSTS",
+
+        "General_AuthorizationBaseUrl": "null",
+        "General_AuthorizationAccessToken": "null",
+        "TokenValidation_Audience": "null",
+
+        "Jwt_Audience": "",
+        "Jwt_Authority": "",
+
+        "AspNetCoreDbUserName": "__DB_USERNAME__",
+        "AspNetCoreDbPassword": "__DB_PASSWORD__"
+      }
+    },
+    "_MicroserviceTemplate_.WebApi": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "AspNetCore_Environment": "Development"
+      },
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+    }
+  }
+}
