@@ -57,6 +57,11 @@ namespace _MicroserviceTemplate_.WebApi
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
             return WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration(builder =>
+                {
+                    builder.AddEnvironmentVariables();
+                    builder.Add(new CustomEnvironmentVariableConfigurationSource());
+                })
                 .UseStartup<Startup>()
                 .ConfigureLogging(logging => logging.ClearProviders())
                 .UseNLog(new NLogAspNetCoreOptions
