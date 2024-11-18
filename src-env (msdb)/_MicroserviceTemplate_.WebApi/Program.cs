@@ -1,4 +1,4 @@
-using _MicroserviceTemplate_.WebApi.Configuration;
+using Benraz.Infrastructure.Common.EnvironmentConfiguration;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

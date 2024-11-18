@@ -1,5 +1,5 @@
 using _MicroserviceTemplate_.EF;
-using _MicroserviceTemplate_.WebApi.Configuration;
+using Benraz.Infrastructure.Common.EnvironmentConfiguration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
