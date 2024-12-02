@@ -1,0 +1,9 @@
+{
+  "AspNetCore_Environment": "Development",
+  "SkipDbTestIfNoConnectionString": "false",
+  "InjectDBCredentialFromEnvironment": "true",
+  "ConnectionStrings": "host=localhost;port=5432;sslmode=prefer;Database=Benraz-_MicroserviceTemplate_.Tests",
+
+  "AspNetCoreDbUserName": "__DB_USERNAME__",
+  "AspNetCoreDbPassword": "__DB_PASSWORD__"
+}
