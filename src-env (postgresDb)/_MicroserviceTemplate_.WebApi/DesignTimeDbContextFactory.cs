@@ -55,7 +55,7 @@ namespace _MicroserviceTemplate_.WebApi
                 if (IsInjectDbCredentialsToConnectionString())
                 {
                     connectionString +=
-                         $";Username={Environment.GetEnvironmentVariable("AspNetCoreDbUserName")};Password={Environment.GetEnvironmentVariable("AspNetCoreDbPassword")}";
+                         $";Username={Environment.GetEnvironmentVariable("AspNetCoreDbUserName")};Password='{Environment.GetEnvironmentVariable("AspNetCoreDbPassword")}'";
                 }
 
                 var optionsBuilder = new DbContextOptionsBuilder<_MicroserviceTemplate_DbContext>();

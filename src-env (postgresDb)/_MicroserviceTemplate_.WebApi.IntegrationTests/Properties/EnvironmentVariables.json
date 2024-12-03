@@ -1,7 +1,7 @@
 {
   "AspNetCore_Environment": "Development",
   "SkipDbTestIfNoConnectionString": "false",
-  "ConnectionStrings": "host=localhost;port=5432;sslmode=prefer;Database=Benraz-_MicroserviceTemplate_.Tests",
+  "ConnectionStrings": "Host=localhost;Port=5432;SslMode=prefer;Database=Benraz-_MicroserviceTemplate_-Tests",
 
   "Audience": "_MicroserviceTemplate_",
 

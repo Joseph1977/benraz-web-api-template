@@ -73,7 +73,7 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
                 if (IsInjectDbCredentialsToConnectionString())
                 {
                     connectionString +=
-                        $";Username={_configuration.GetValue<string>("AspNetCoreDbUserName")};Password={_configuration.GetValue<string>("AspNetCoreDbPassword")}";
+                        $";Username={_configuration.GetValue<string>("AspNetCoreDbUserName")};Password='{_configuration.GetValue<string>("AspNetCoreDbPassword")}'";
                 }
 
                 builder.UseNpgsql(connectionString); 

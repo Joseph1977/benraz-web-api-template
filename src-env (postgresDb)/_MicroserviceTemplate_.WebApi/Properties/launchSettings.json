@@ -14,7 +14,7 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "AspNetCore_Environment": "Development",
-        "ConnectionStrings": "host=localhost;port=5432;sslmode=prefer;Database=Benraz-_MicroserviceTemplate_",
+        "ConnectionStrings": "Host=localhost;Port=5432;SslMode=prefer;Database=Benraz-_MicroserviceTemplate_",
 
         "Audience": "_MicroserviceTemplate_",
 

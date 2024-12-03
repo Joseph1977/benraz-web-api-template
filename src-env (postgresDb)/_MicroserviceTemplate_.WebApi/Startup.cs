@@ -129,7 +129,7 @@ namespace _MicroserviceTemplate_.WebApi
                 if (IsInjectDbCredentialsToConnectionString())
                 {
                     connectionString +=
-                        $";Username={Configuration.GetValue<string>("AspNetCoreDbUserName")};Password={Configuration.GetValue<string>("AspNetCoreDbPassword")}";
+                        $";Username={Configuration.GetValue<string>("AspNetCoreDbUserName")};Password='{Configuration.GetValue<string>("AspNetCoreDbPassword")}'";
                 }
 
                 services.AddDbContext<_MicroserviceTemplate_DbContext>(options =>
