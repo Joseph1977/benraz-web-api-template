@@ -63,7 +63,7 @@ namespace _MicroserviceTemplate_.WebApi
             services.AddMvc();
             services.AddCors();
 
-            ConfigureSqlServerContext(services);
+            ConfigureDatabaseProviderContext(services);
 
             services.AddAutoMapper(typeof(_MicroserviceTemplate_AutoMapperProfile));
 
@@ -126,7 +126,7 @@ namespace _MicroserviceTemplate_.WebApi
             });
         }
 
-        private void ConfigureSqlServerContext(IServiceCollection services)
+        private void ConfigureDatabaseProviderContext(IServiceCollection services)
         {
             if (IsCheckConnectionStringExists())
             {
