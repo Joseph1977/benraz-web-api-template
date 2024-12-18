@@ -27,8 +27,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 #if SQLSERVER
 using _MicroserviceTemplate_.EF.SqlServer.Services;
+using _MicroserviceTemplate_.EF.SqlServer;
 #else
 using _MicroserviceTemplate_.EF.PostgreSql.Services;
+using _MicroserviceTemplate_.EF.PostgreSql;
 #endif
 
 namespace _MicroserviceTemplate_.WebApi
@@ -61,11 +63,7 @@ namespace _MicroserviceTemplate_.WebApi
             services.AddMvc();
             services.AddCors();
 
-            #if SQLSERVER
             ConfigureSqlServerContext(services);
-            #else
-            ConfigurePostgreSqlContext(services);
-            #endif
 
             services.AddAutoMapper(typeof(_MicroserviceTemplate_AutoMapperProfile));
 
@@ -135,38 +133,30 @@ namespace _MicroserviceTemplate_.WebApi
                 string connectionString = Configuration.GetValue<string>("ConnectionStrings");
                 if (IsInjectDbCredentialsToConnectionString())
                 {
+                    #if SQLSERVER
                     connectionString +=
                         $";User Id={Configuration.GetValue<string>("AspNetCoreDbUserName")};Password='{Configuration.GetValue<string>("AspNetCoreDbPassword")}'";
+                    #else
+                    connectionString +=
+                        $";Username={Configuration.GetValue<string>("AspNetCoreDbUserName")};Password='{Configuration.GetValue<string>("AspNetCoreDbPassword")}'";
+                    #endif
                 }
 
-                services.AddDbContext<_MicroserviceTemplate_.EF.SqlServer._MicroserviceTemplate_DbContext>(options =>
+                services.AddDbContext<_MicroserviceTemplate_DbContext>(options =>
+                    #if SQLSERVER
                     options.UseSqlServer(
                         connectionString,
                         o => o.EnableRetryOnFailure(3)
                     ));
-            }
-            else
-                services.AddDbContext<_MicroserviceTemplate_.EF.SqlServer._MicroserviceTemplate_DbContext>();
-        }
-        
-        private void ConfigurePostgreSqlContext(IServiceCollection services)
-        {
-            if (IsCheckConnectionStringExists())
-            {
-                string connectionString = Configuration.GetValue<string>("ConnectionStrings");
-                if (IsInjectDbCredentialsToConnectionString())
-                {
-                    connectionString +=
-                        $";Username={Configuration.GetValue<string>("AspNetCoreDbUserName")};Password='{Configuration.GetValue<string>("AspNetCoreDbPassword")}'";
-                }
-                services.AddDbContext<_MicroserviceTemplate_.EF.PostgreSql._MicroserviceTemplate_DbContext>(options =>
+                    #else
                     options.UseNpgsql(
                         connectionString,
                         o => o.EnableRetryOnFailure(3)
                     ));
+                    #endif
             }
             else
-                services.AddDbContext<_MicroserviceTemplate_.EF.PostgreSql._MicroserviceTemplate_DbContext>();
+                services.AddDbContext<_MicroserviceTemplate_DbContext>();
         }
 
         private void AddServices(IServiceCollection services)

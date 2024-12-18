@@ -6,12 +6,12 @@
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<DocumentationFile>bin\Debug\net8.0\_MicroserviceTemplate_.WebApi.xml</DocumentationFile>
-		<DefineConstants>TRACE</DefineConstants>
+		<DefineConstants>TRACE;POSTGRESQL</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DocumentationFile>bin\Release\net8.0\_MicroserviceTemplate_.WebApi.xml</DocumentationFile>
-		<DefineConstants>TRACE;EnableAuthorization</DefineConstants>
+		<DefineConstants>TRACE;POSTGRESQL;EnableAuthorization</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
