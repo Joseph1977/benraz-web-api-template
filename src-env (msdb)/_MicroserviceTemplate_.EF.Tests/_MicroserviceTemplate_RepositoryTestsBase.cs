@@ -1,8 +1,11 @@
 using Benraz.Infrastructure.Common.EntityBase;
+using Benraz.Infrastructure.Common.EnvironmentConfiguration;
 using Benraz.Infrastructure.Common.Repositories;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
 using System.IO;
@@ -20,9 +23,29 @@ namespace _MicroserviceTemplate_.EF.Tests
         [SetUp]
         public virtual async Task SetUpAsync()
         {
+            // Load EnvironmentVariables.json
+            var launchSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), "Properties", "EnvironmentVariables.json");
+
+            if (File.Exists(launchSettingsPath))
+            {
+                var jsonContent = File.ReadAllText(launchSettingsPath);
+                var jsonReader = new JsonTextReader(new StringReader(jsonContent));
+                var launchSettings = JObject.Load(jsonReader);
+
+                var environmentVariables = launchSettings.Root;
+                if (environmentVariables != null)
+                {
+                    foreach (JProperty variable in environmentVariables)
+                    {
+                        Environment.SetEnvironmentVariable(variable.Name, variable.Value.ToString());
+                    }
+                }
+            }
+
             configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("Properties/EnvironmentVariables.json", optional: true, reloadOnChange: true)
+            .Add(new CustomEnvironmentVariableConfigurationSource())
             .Build();
 
             if (!IsCheckConnectionStringExists())

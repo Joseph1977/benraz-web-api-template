@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -22,6 +25,25 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
         [OneTimeSetUp]
         public static void SetUpFixture()
         {
+            // Load EnvironmentVariables.json
+            var launchSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), "Properties", "EnvironmentVariables.json");
+
+            if (File.Exists(launchSettingsPath))
+            {
+                var jsonContent = File.ReadAllText(launchSettingsPath);
+                var jsonReader = new JsonTextReader(new StringReader(jsonContent));
+                var launchSettings = JObject.Load(jsonReader);
+
+                var environmentVariables = launchSettings.Root;
+                if (environmentVariables != null)
+                {
+                    foreach (JProperty variable in environmentVariables)
+                    {
+                        Environment.SetEnvironmentVariable(variable.Name, variable.Value.ToString());
+                    }
+                }
+            }
+
             _configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("Properties/EnvironmentVariables.json", optional: true, reloadOnChange: true)
