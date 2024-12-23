@@ -98,11 +98,18 @@ namespace _MicroserviceTemplate_.WebApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                Console.WriteLine($"We are running in debug: UseDeveloperExceptionPage");
             }
             else
             {
                 app.UseHsts();
-                app.UseHttpsRedirection();
+                var enforceHttps = Configuration.GetValue<bool>("EnforceHttps", true);
+                Console.WriteLine($"Enforce HTTPS: {enforceHttps}");
+
+                if (enforceHttps)
+                {
+                    app.UseHttpsRedirection();
+                }
             }
 
             UseDatabaseMigrations(app);
@@ -202,6 +209,8 @@ namespace _MicroserviceTemplate_.WebApi
                     options.Audience = Configuration["Jwt:Audience"];
                     options.Authority = Configuration["Jwt:Authority"];
 
+                    var enforceHttps = Configuration.GetValue<bool>("EnforceHttps", true);
+                    options.RequireHttpsMetadata = enforceHttps;
                 });
 
             services
