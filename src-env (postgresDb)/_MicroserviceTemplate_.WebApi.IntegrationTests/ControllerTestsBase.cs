@@ -1,4 +1,6 @@
 using _MicroserviceTemplate_.EF;
+using Benraz.Infrastructure.Common.CommonUtilities;
+using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -17,7 +19,7 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
             HttpClient = Config.HttpClient;
             DBContext = Config.DBContext;
 
-            var _connectionString = Config.IsCheckConnectionStringExists();
+            var _connectionString = CommonUtilities.IsNeedToConnectToDB(Config._configuration.GetValue<string>("ConnectionStrings"), Config._configuration.GetValue<bool>("SkipDbConnectIfNoConnectionString"));
 
             if (!_connectionString)
             {
@@ -32,7 +34,7 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
         [TearDown]
         public virtual async Task TearDownAsync()
         {
-            var _connectionString = Config.IsCheckConnectionStringExists();
+            var _connectionString = CommonUtilities.IsNeedToConnectToDB(Config._configuration.GetValue<string>("ConnectionStrings"), Config._configuration.GetValue<bool>("SkipDbConnectIfNoConnectionString"));
 
             if (_connectionString)
             {

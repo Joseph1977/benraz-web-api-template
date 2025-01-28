@@ -12,6 +12,7 @@ using Asp.Versioning.ApiExplorer;
 using Benraz.Infrastructure.Authorization.Tokens;
 using Benraz.Infrastructure.Common.AccessControl;
 using Benraz.Infrastructure.Common.BackgroundQueue;
+using Benraz.Infrastructure.Common.CommonUtilities;
 using Benraz.Infrastructure.Common.DataRedundancy;
 using Benraz.Infrastructure.Gateways.BenrazAuthorization.Auth;
 using Benraz.Infrastructure.Web.Authorization;
@@ -130,15 +131,10 @@ namespace _MicroserviceTemplate_.WebApi
 
         private void ConfigureSqlServerContext(IServiceCollection services)
         {
-            if (IsCheckConnectionStringExists())
+            if (CommonUtilities.IsNeedToConnectToDB(Configuration.GetValue<string>("ConnectionStrings"), Configuration.GetValue<bool>("SkipDbConnectIfNoConnectionString")))
             {
-                string connectionString = Configuration.GetValue<string>("ConnectionStrings");
-                if (IsInjectDbCredentialsToConnectionString())
-                {
-                    connectionString +=
-                        $";Username={Configuration.GetValue<string>("AspNetCoreDbUserName")};Password='{Configuration.GetValue<string>("AspNetCoreDbPassword")}'";
-                }
-
+                string connectionString = CommonUtilities.GetConnectString(Configuration);
+                
                 services.AddDbContext<_MicroserviceTemplate_DbContext>(options =>
                     options.UseNpgsql(
                         connectionString,
@@ -269,29 +265,13 @@ namespace _MicroserviceTemplate_.WebApi
 
         private void UseDatabaseMigrations(IApplicationBuilder app)
         {
-            if (IsCheckConnectionStringExists())
+            if (CommonUtilities.IsNeedToConnectToDB(Configuration.GetValue<string>("ConnectionStrings"), Configuration.GetValue<bool>("SkipDbConnectIfNoConnectionString")))
             {
                 using (var scope = app.ApplicationServices.CreateScope())
                 {
                     scope.ServiceProvider.GetRequiredService<IDbMigrationService>().MigrateAsync().Wait();
                 }
             }  
-        }
-
-        private bool IsInjectDbCredentialsToConnectionString()
-        {
-            return Configuration.GetValue<bool>("InjectDBCredentialFromEnvironment");
-        }
-
-        private bool IsCheckConnectionStringExists()
-        {
-            bool isExists = true;
-            string connectionString = Configuration.GetValue<string>("ConnectionStrings");
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                isExists = false;
-            }
-            return isExists;
         }
     }
 }
