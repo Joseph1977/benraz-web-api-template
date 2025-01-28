@@ -2,10 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
 using System.IO;
+using Benraz.Infrastructure.Common.CommonUtilities;
 #if SQLSERVER
 using _MicroserviceTemplate_.EF.SqlServer;
 #else
@@ -28,22 +26,7 @@ namespace _MicroserviceTemplate_.WebApi
         {
             // Load launchSettings.json
             var launchSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), "Properties", "launchSettings.json");
-
-            if (File.Exists(launchSettingsPath))
-            {
-                var jsonContent = File.ReadAllText(launchSettingsPath);
-                var jsonReader = new JsonTextReader(new StringReader(jsonContent));
-                var launchSettings = JObject.Load(jsonReader);
-
-                var environmentVariables = launchSettings["profiles"]?["IIS Express"]?["environmentVariables"];
-                if (environmentVariables != null)
-                {
-                    foreach (JProperty variable in environmentVariables)
-                    {
-                        Environment.SetEnvironmentVariable(variable.Name, variable.Value.ToString());
-                    }
-                }
-            }
+            CommonUtilities.LoadEnvironmentVariablesFromJson(launchSettingsPath, "profiles['IIS Express'].environmentVariables");
 
             // Load environment for default configuration
             var configuration = new ConfigurationBuilder()
@@ -52,54 +35,22 @@ namespace _MicroserviceTemplate_.WebApi
                 .Add(new CustomEnvironmentVariableConfigurationSource())
                 .Build();
 
-            if (IsCheckConnectionStringExists())
+            string connectionString = null;
+            if (CommonUtilities.IsNeedToConnectToDB(configuration.GetValue<string>("ConnectionStrings"), configuration.GetValue<bool>("SkipDbConnectIfNoConnectionString")))
             {
-                string connectionString = Environment.GetEnvironmentVariable("ConnectionStrings");
-
-                if (IsInjectDbCredentialsToConnectionString())
-                {
-                    #if SQLSERVER
-                    connectionString +=
-                         $";User Id={Environment.GetEnvironmentVariable("AspNetCoreDbUserName")};Password='{Environment.GetEnvironmentVariable("AspNetCoreDbPassword")}'";
-                    #else
-                    connectionString +=
-                         $";Username={Environment.GetEnvironmentVariable("AspNetCoreDbUserName")};Password='{Environment.GetEnvironmentVariable("AspNetCoreDbPassword")}'";
-                    #endif
-                }
-
-                var optionsBuilder = new DbContextOptionsBuilder<_MicroserviceTemplate_DbContext>();
-                
                 #if SQLSERVER
-                optionsBuilder.UseSqlServer(connectionString);
+                connectionString = CommonUtilities.GetConnectString(configuration, true);
                 #else
-                optionsBuilder.UseNpgsql(connectionString);
+                connectionString = CommonUtilities.GetConnectString(configuration);
                 #endif
-                
-                return new _MicroserviceTemplate_DbContext(optionsBuilder.Options);
             }
-            else
-            {
-                var optionsBuilder = new DbContextOptionsBuilder<_MicroserviceTemplate_DbContext>();
-                return new _MicroserviceTemplate_DbContext(optionsBuilder.Options);
-            }
-        }
-
-        private bool IsInjectDbCredentialsToConnectionString()
-        {
-            bool result;
-            bool.TryParse(Environment.GetEnvironmentVariable("InjectDBCredentialFromEnvironment"), out result);
-            return result;
-        }
-
-        private bool IsCheckConnectionStringExists()
-        {
-            bool isExists = true;
-            string connectionString = Environment.GetEnvironmentVariable("ConnectionStrings");
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                isExists = false;
-            }
-            return isExists;
+            var optionsBuilder = new DbContextOptionsBuilder<_MicroserviceTemplate_DbContext>();
+            #if SQLSERVER
+            optionsBuilder.UseSqlServer(connectionString);
+            #else
+            optionsBuilder.UseNpgsql(connectionString);
+            #endif
+            return new _MicroserviceTemplate_DbContext(optionsBuilder.Options);
         }
     }
 }

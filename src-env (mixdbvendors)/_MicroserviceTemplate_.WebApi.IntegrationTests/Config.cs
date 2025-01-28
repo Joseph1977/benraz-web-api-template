@@ -3,13 +3,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Benraz.Infrastructure.Common.CommonUtilities;
 #if SQLSERVER
 using _MicroserviceTemplate_.EF.SqlServer;
 #else
@@ -21,8 +19,7 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
     [SetUpFixture]
     public class Config
     {
-        private static IConfiguration _configuration;
-
+        public static IConfiguration _configuration;
         public static _MicroserviceTemplate_DbContext DBContext;
         public static HttpClient HttpClient;
 
@@ -31,22 +28,7 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
         {
             // Load EnvironmentVariables.json
             var launchSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), "Properties", "EnvironmentVariables.json");
-
-            if (File.Exists(launchSettingsPath))
-            {
-                var jsonContent = File.ReadAllText(launchSettingsPath);
-                var jsonReader = new JsonTextReader(new StringReader(jsonContent));
-                var launchSettings = JObject.Load(jsonReader);
-
-                var environmentVariables = launchSettings.Root;
-                if (environmentVariables != null)
-                {
-                    foreach (JProperty variable in environmentVariables)
-                    {
-                        Environment.SetEnvironmentVariable(variable.Name, variable.Value.ToString());
-                    }
-                }
-            }
+            CommonUtilities.LoadEnvironmentVariablesFromJson(launchSettingsPath);
 
             _configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -70,51 +52,18 @@ namespace _MicroserviceTemplate_.WebApi.IntegrationTests
         public static _MicroserviceTemplate_DbContext CreateDbContext()
         {
             var builder = new DbContextOptionsBuilder<_MicroserviceTemplate_DbContext>().EnableSensitiveDataLogging();
-            
-            if (IsCheckConnectionStringExists())
+
+            if (CommonUtilities.IsNeedToConnectToDB(_configuration.GetValue<string>("ConnectionStrings"), _configuration.GetValue<bool>("SkipDbConnectIfNoConnectionString")))
             {
-                string connectionString = _configuration.GetValue<string>("ConnectionStrings");
                 #if SQLSERVER
-                if (IsInjectDbCredentialsToConnectionString())
-                {
-                    connectionString +=
-                        $";User Id={_configuration.GetValue<string>("AspNetCoreDbUserName")};Password='{_configuration.GetValue<string>("AspNetCoreDbPassword")}'";
-                }
-
-                builder.UseSqlServer(connectionString); 
+                string connectionString = CommonUtilities.GetConnectString(_configuration, true);
+                builder.UseSqlServer(connectionString);
                 #else
-                if (IsInjectDbCredentialsToConnectionString())
-                {
-                    connectionString +=
-                        $";Username={_configuration.GetValue<string>("AspNetCoreDbUserName")};Password='{_configuration.GetValue<string>("AspNetCoreDbPassword")}'";
-                }
-
-                builder.UseNpgsql(connectionString); 
+                string connectionString = CommonUtilities.GetConnectString(_configuration);
+                builder.UseNpgsql(connectionString);
                 #endif
             }
             return new _MicroserviceTemplate_DbContext(builder.Options);
-        }
-
-        private static bool IsInjectDbCredentialsToConnectionString()
-        {
-            return _configuration.GetValue<bool>("InjectDBCredentialFromEnvironment");
-        }
-
-        public static bool IsCheckConnectionStringExists()
-        {
-            if (_configuration.GetValue<bool>("SkipDbTestIfNoConnectionString"))
-            {
-                return false;
-            }
-            else
-            {
-                string connectionString = _configuration.GetValue<string>("ConnectionStrings");
-                if (string.IsNullOrWhiteSpace(connectionString))
-                {
-                    return false;
-                }
-                return true;
-            }
         }
     }
 }

@@ -25,6 +25,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
+using Benraz.Infrastructure.Common.CommonUtilities;
 #if SQLSERVER
 using _MicroserviceTemplate_.EF.SqlServer.Services;
 using _MicroserviceTemplate_.EF.SqlServer;
@@ -135,35 +136,25 @@ namespace _MicroserviceTemplate_.WebApi
 
         private void ConfigureDatabaseProviderContext(IServiceCollection services)
         {
-            if (IsCheckConnectionStringExists())
+            if (CommonUtilities.IsNeedToConnectToDB(Configuration.GetValue<string>("ConnectionStrings"), Configuration.GetValue<bool>("SkipDbConnectIfNoConnectionString")))
             {
-                string connectionString = Configuration.GetValue<string>("ConnectionStrings");
-                if (IsInjectDbCredentialsToConnectionString())
-                {
-                    #if SQLSERVER
-                    connectionString +=
-                        $";User Id={Configuration.GetValue<string>("AspNetCoreDbUserName")};Password='{Configuration.GetValue<string>("AspNetCoreDbPassword")}'";
-                    #else
-                    connectionString +=
-                        $";Username={Configuration.GetValue<string>("AspNetCoreDbUserName")};Password='{Configuration.GetValue<string>("AspNetCoreDbPassword")}'";
-                    #endif
-                }
-
                 services.AddDbContext<_MicroserviceTemplate_DbContext>(options =>
                     #if SQLSERVER
                     options.UseSqlServer(
-                        connectionString,
+                        CommonUtilities.GetConnectString(Configuration, true),
                         o => o.EnableRetryOnFailure(3)
                     ));
                     #else
                     options.UseNpgsql(
-                        connectionString,
+                        CommonUtilities.GetConnectString(Configuration),
                         o => o.EnableRetryOnFailure(3)
                     ));
                     #endif
             }
             else
                 services.AddDbContext<_MicroserviceTemplate_DbContext>();
+
+            services.AddScoped<DbContext>(provider => provider.GetService<_MicroserviceTemplate_DbContext>());
         }
 
         private void AddServices(IServiceCollection services)
@@ -286,29 +277,13 @@ namespace _MicroserviceTemplate_.WebApi
 
         private void UseDatabaseMigrations(IApplicationBuilder app)
         {
-            if (IsCheckConnectionStringExists())
+            if (CommonUtilities.IsNeedToConnectToDB(Configuration.GetValue<string>("ConnectionStrings"), Configuration.GetValue<bool>("SkipDbConnectIfNoConnectionString")))
             {
                 using (var scope = app.ApplicationServices.CreateScope())
                 {
                     scope.ServiceProvider.GetRequiredService<IDbMigrationService>().MigrateAsync().Wait();
                 }
             }
-        }
-
-        private bool IsInjectDbCredentialsToConnectionString()
-        {
-            return Configuration.GetValue<bool>("InjectDBCredentialFromEnvironment");
-        }
-
-        private bool IsCheckConnectionStringExists()
-        {
-            bool isExists = true;
-            string connectionString = Configuration.GetValue<string>("ConnectionStrings");
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                isExists = false;
-            }
-            return isExists;
         }
     }
 }
