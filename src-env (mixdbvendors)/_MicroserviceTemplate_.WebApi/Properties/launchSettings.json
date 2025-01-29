@@ -30,7 +30,7 @@
         "SwaggerBasePath": "_microservicetemplate_-server",
         "EnablesApplicationInsights": "false",
 
-        "Region": "USE1",
+        "Region": "USC1",
         "Environment": "DEV",
         "ServiceName": "_microservicetemplate_-server",
         "Service": "MSTS",
@@ -67,7 +67,7 @@
         "SwaggerBasePath": "_microservicetemplate_-server",
         "EnablesApplicationInsights": "false",
 
-        "Region": "USE1",
+        "Region": "USC1",
         "Environment": "DEV",
         "ServiceName": "_microservicetemplate_-server",
         "Service": "MSTS",
