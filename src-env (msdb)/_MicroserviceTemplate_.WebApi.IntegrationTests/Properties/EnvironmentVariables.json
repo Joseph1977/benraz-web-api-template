@@ -1,6 +1,6 @@
 {
   "AspNetCore_Environment": "Development",
-  "SkipDbTestIfNoConnectionString": "true",
+  "SkipDbConnectIfNoConnectionString": "true",
   "ConnectionStrings": "Data Source=(localdb)\\mssqllocaldb;Integrated Security=SSPI;Initial Catalog=Benraz._MicroserviceTemplate_.Test",
 
   "Audience": "_MicroserviceTemplate_",
@@ -16,7 +16,7 @@
   "SwaggerBasePath": "_microservicetemplate_-server",
   "EnablesApplicationInsights": "false",
 
-  "Region": "USE1",
+  "Region": "USC1",
   "Environment": "DEV",
   "ServiceName": "_microservicetemplate_-server",
   "Service": "MSTS",

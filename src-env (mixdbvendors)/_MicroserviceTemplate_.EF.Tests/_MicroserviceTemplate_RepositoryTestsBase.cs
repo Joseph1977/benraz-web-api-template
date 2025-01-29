@@ -4,12 +4,11 @@ using Benraz.Infrastructure.Common.Repositories;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Benraz.Infrastructure.Common.CommonUtilities;
 #if SQLSERVER
 using _MicroserviceTemplate_.EF.SqlServer;
 #else
@@ -30,22 +29,7 @@ namespace _MicroserviceTemplate_.EF.Tests
         {
             // Load EnvironmentVariables.json
             var launchSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), "Properties", "EnvironmentVariables.json");
-
-            if (File.Exists(launchSettingsPath))
-            {
-                var jsonContent = File.ReadAllText(launchSettingsPath);
-                var jsonReader = new JsonTextReader(new StringReader(jsonContent));
-                var launchSettings = JObject.Load(jsonReader);
-
-                var environmentVariables = launchSettings.Root;
-                if (environmentVariables != null)
-                {
-                    foreach (JProperty variable in environmentVariables)
-                    {
-                        Environment.SetEnvironmentVariable(variable.Name, variable.Value.ToString());
-                    }
-                }
-            }
+            CommonUtilities.LoadEnvironmentVariablesFromJson(launchSettingsPath);
 
             configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
@@ -53,7 +37,7 @@ namespace _MicroserviceTemplate_.EF.Tests
             .Add(new CustomEnvironmentVariableConfigurationSource())
             .Build();
 
-            if (!IsCheckConnectionStringExists())
+            if (!CommonUtilities.IsNeedToConnectToDB(configuration.GetValue<string>("ConnectionStrings"), configuration.GetValue<bool>("SkipDbConnectIfNoConnectionString")))
             {
                 Assert.Ignore("Connection string is missing. Skipping test.");
             }
@@ -67,7 +51,7 @@ namespace _MicroserviceTemplate_.EF.Tests
         [TearDown]
         public virtual async Task TearDownAsync()
         {
-            if (IsCheckConnectionStringExists())
+            if (CommonUtilities.IsNeedToConnectToDB(configuration.GetValue<string>("ConnectionStrings"), configuration.GetValue<bool>("SkipDbConnectIfNoConnectionString")))
             {
                 await ClearDataAsync();
             }
@@ -79,10 +63,10 @@ namespace _MicroserviceTemplate_.EF.Tests
             var entity = CreateDefaultEntity();
 
             await CreateRepository().AddAsync(entity);
-            entity = RoundToMilliseconds(entity);
+            entity = CommonUtilities.RoundToMilliseconds(entity);
 
             var dbEntity = await CreateRepository().GetByIdAsync(entity.Id);
-            dbEntity = RoundToMilliseconds(dbEntity);
+            dbEntity = CommonUtilities.RoundToMilliseconds(dbEntity);
 
             dbEntity.Should().BeEquivalentTo(entity);
         }
@@ -95,10 +79,10 @@ namespace _MicroserviceTemplate_.EF.Tests
 
             entity = ChangeEntity(entity);
             await CreateRepository().ChangeAsync(entity);
-            entity = RoundToMilliseconds(entity);
+            entity = CommonUtilities.RoundToMilliseconds(entity);
 
             var dbEntity = await CreateRepository().GetByIdAsync(entity.Id);
-            dbEntity = RoundToMilliseconds(dbEntity);
+            dbEntity = CommonUtilities.RoundToMilliseconds(dbEntity);
 
             dbEntity.Should().BeEquivalentTo(entity);
         }
@@ -112,10 +96,10 @@ namespace _MicroserviceTemplate_.EF.Tests
 
             entity = ChangeEntity(entity);
             await repository.ChangeAsync(entity);
-            entity = RoundToMilliseconds(entity);
+            entity = CommonUtilities.RoundToMilliseconds(entity);
 
             var dbEntity = await CreateRepository().GetByIdAsync(entity.Id);
-            dbEntity = RoundToMilliseconds(dbEntity);
+            dbEntity = CommonUtilities.RoundToMilliseconds(dbEntity);
             
             dbEntity.Should().BeEquivalentTo(entity);
         }
@@ -168,69 +152,17 @@ namespace _MicroserviceTemplate_.EF.Tests
         protected DbContextOptionsBuilder<_MicroserviceTemplate_DbContext> CreateContextBuilder()
         {
             var builder = new DbContextOptionsBuilder<_MicroserviceTemplate_DbContext>();
-            if (IsCheckConnectionStringExists())
+            if (CommonUtilities.IsNeedToConnectToDB(configuration.GetValue<string>("ConnectionStrings"), configuration.GetValue<bool>("SkipDbConnectIfNoConnectionString")))
             {
-                string connectionString = configuration.GetValue<string>("ConnectionStrings");
                 #if SQLSERVER
-                if (configuration.GetValue<bool>("InjectDBCredentialFromEnvironment"))
-                {
-                    connectionString +=
-                        $";User Id={configuration.GetValue<string>("AspNetCoreDbUserName")};Password={configuration.GetValue<string>("AspNetCoreDbPassword")}";
-                }
+                string connectionString = CommonUtilities.GetConnectString(configuration, true);
                 builder.UseSqlServer(connectionString);
                 #else
-                if (configuration.GetValue<bool>("InjectDBCredentialFromEnvironment"))
-                {
-                    connectionString +=
-                        $";Username={configuration.GetValue<string>("AspNetCoreDbUserName")};Password={configuration.GetValue<string>("AspNetCoreDbPassword")}";
-                }
+                string connectionString = CommonUtilities.GetConnectString(configuration);
                 builder.UseNpgsql(connectionString);
                 #endif
             }
             return builder;
-        }
-
-        public bool IsCheckConnectionStringExists()
-        {
-            if (configuration.GetValue<bool>("SkipDbTestIfNoConnectionString"))
-            {
-                return false;
-            }
-            else
-            {
-                string connectionString = configuration.GetValue<string>("ConnectionStrings");
-                if (string.IsNullOrWhiteSpace(connectionString))
-                {
-                    return false;
-                }
-                return true;
-            }
-        }
-
-        private static TEntity RoundToMilliseconds<TEntity>(TEntity entity)
-        {
-            // Get the type of the entity
-            var entityType = typeof(TEntity);
-
-            // Check if the 'CreateTimeUtc' property exists and is of type DateTime
-            var createTimeUtcProperty = entityType.GetProperty("CreateTimeUtc");
-            if (createTimeUtcProperty != null && createTimeUtcProperty.PropertyType == typeof(DateTime))
-            {
-                var createTimeUtcValue = (DateTime)createTimeUtcProperty.GetValue(entity);
-                // Round to milliseconds
-                createTimeUtcProperty.SetValue(entity, new DateTime((createTimeUtcValue.Ticks / TimeSpan.TicksPerMillisecond) * TimeSpan.TicksPerMillisecond));
-            }
-
-            // Check if the 'UpdateTimeUtc' property exists and is of type DateTime
-            var updateTimeUtcProperty = entityType.GetProperty("UpdateTimeUtc");
-            if (updateTimeUtcProperty != null && updateTimeUtcProperty.PropertyType == typeof(DateTime))
-            {
-                var updateTimeUtcValue = (DateTime)updateTimeUtcProperty.GetValue(entity);
-                // Round to milliseconds
-                updateTimeUtcProperty.SetValue(entity, new DateTime((updateTimeUtcValue.Ticks / TimeSpan.TicksPerMillisecond) * TimeSpan.TicksPerMillisecond));
-            }
-
-            return entity;
         }
     }
 }

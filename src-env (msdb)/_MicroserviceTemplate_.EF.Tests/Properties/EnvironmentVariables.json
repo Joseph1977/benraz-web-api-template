@@ -1,6 +1,6 @@
 {
   "AspNetCore_Environment": "Development",
-  "SkipDbTestIfNoConnectionString": "true",
+  "SkipDbConnectIfNoConnectionString": "true",
   "InjectDBCredentialFromEnvironment": "false",
   "ConnectionStrings": "Data Source=(localdb)\\mssqllocaldb;Integrated Security=SSPI;Initial Catalog=Benraz._MicroserviceTemplate_.Test",
 

@@ -1,11 +1,9 @@
 ﻿using _MicroserviceTemplate_.EF;
+using Benraz.Infrastructure.Common.CommonUtilities;
 using Benraz.Infrastructure.Common.EnvironmentConfiguration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
 using System.IO;
 
 namespace _MicroserviceTemplate_.WebApi
@@ -24,22 +22,7 @@ namespace _MicroserviceTemplate_.WebApi
         {
             // Load launchSettings.json
             var launchSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), "Properties", "launchSettings.json");
-
-            if (File.Exists(launchSettingsPath))
-            {
-                var jsonContent = File.ReadAllText(launchSettingsPath);
-                var jsonReader = new JsonTextReader(new StringReader(jsonContent));
-                var launchSettings = JObject.Load(jsonReader);
-
-                var environmentVariables = launchSettings["profiles"]?["IIS Express"]?["environmentVariables"];
-                if (environmentVariables != null)
-                {
-                    foreach (JProperty variable in environmentVariables)
-                    {
-                        Environment.SetEnvironmentVariable(variable.Name, variable.Value.ToString());
-                    }
-                }
-            }
+            CommonUtilities.LoadEnvironmentVariablesFromJson(launchSettingsPath, "profiles['IIS Express'].environmentVariables");
 
             // Load environment for default configuration
             var configuration = new ConfigurationBuilder()
@@ -48,43 +31,14 @@ namespace _MicroserviceTemplate_.WebApi
                 .Add(new CustomEnvironmentVariableConfigurationSource())
                 .Build();
 
-            if (IsCheckConnectionStringExists())
+            string connectionString = null;
+            if (CommonUtilities.IsNeedToConnectToDB(configuration.GetValue<string>("ConnectionStrings"), configuration.GetValue<bool>("SkipDbConnectIfNoConnectionString")))
             {
-                string connectionString = Environment.GetEnvironmentVariable("ConnectionStrings");
-
-                if (IsInjectDbCredentialsToConnectionString())
-                {
-                    connectionString +=
-                         $";Username={Environment.GetEnvironmentVariable("AspNetCoreDbUserName")};Password='{Environment.GetEnvironmentVariable("AspNetCoreDbPassword")}'";
-                }
-
-                var optionsBuilder = new DbContextOptionsBuilder<_MicroserviceTemplate_DbContext>();
-                optionsBuilder.UseNpgsql(connectionString);
-                return new _MicroserviceTemplate_DbContext(optionsBuilder.Options);
+                connectionString = CommonUtilities.GetConnectString(configuration);
             }
-            else
-            {
-                var optionsBuilder = new DbContextOptionsBuilder<_MicroserviceTemplate_DbContext>();
-                return new _MicroserviceTemplate_DbContext(optionsBuilder.Options);
-            }
-        }
-
-        private bool IsInjectDbCredentialsToConnectionString()
-        {
-            bool result;
-            bool.TryParse(Environment.GetEnvironmentVariable("InjectDBCredentialFromEnvironment"), out result);
-            return result;
-        }
-
-        private bool IsCheckConnectionStringExists()
-        {
-            bool isExists = true;
-            string connectionString = Environment.GetEnvironmentVariable("ConnectionStrings");
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                isExists = false;
-            }
-            return isExists;
+            var optionsBuilder = new DbContextOptionsBuilder<_MicroserviceTemplate_DbContext>();
+            optionsBuilder.UseNpgsql(connectionString);
+            return new _MicroserviceTemplate_DbContext(optionsBuilder.Options);
         }
     }
 }

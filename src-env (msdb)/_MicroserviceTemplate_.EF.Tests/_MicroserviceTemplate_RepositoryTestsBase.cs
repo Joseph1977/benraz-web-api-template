@@ -1,11 +1,10 @@
+using Benraz.Infrastructure.Common.CommonUtilities;
 using Benraz.Infrastructure.Common.EntityBase;
 using Benraz.Infrastructure.Common.EnvironmentConfiguration;
 using Benraz.Infrastructure.Common.Repositories;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
 using System.IO;
@@ -25,22 +24,7 @@ namespace _MicroserviceTemplate_.EF.Tests
         {
             // Load EnvironmentVariables.json
             var launchSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), "Properties", "EnvironmentVariables.json");
-
-            if (File.Exists(launchSettingsPath))
-            {
-                var jsonContent = File.ReadAllText(launchSettingsPath);
-                var jsonReader = new JsonTextReader(new StringReader(jsonContent));
-                var launchSettings = JObject.Load(jsonReader);
-
-                var environmentVariables = launchSettings.Root;
-                if (environmentVariables != null)
-                {
-                    foreach (JProperty variable in environmentVariables)
-                    {
-                        Environment.SetEnvironmentVariable(variable.Name, variable.Value.ToString());
-                    }
-                }
-            }
+            CommonUtilities.LoadEnvironmentVariablesFromJson(launchSettingsPath);
 
             configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
@@ -48,7 +32,7 @@ namespace _MicroserviceTemplate_.EF.Tests
             .Add(new CustomEnvironmentVariableConfigurationSource())
             .Build();
 
-            if (!IsCheckConnectionStringExists())
+            if (!CommonUtilities.IsNeedToConnectToDB(configuration.GetValue<string>("ConnectionStrings"), configuration.GetValue<bool>("SkipDbConnectIfNoConnectionString")))
             {
                 Assert.Ignore("Connection string is missing. Skipping test.");
             }
@@ -62,7 +46,7 @@ namespace _MicroserviceTemplate_.EF.Tests
         [TearDown]
         public virtual async Task TearDownAsync()
         {
-            if (IsCheckConnectionStringExists())
+            if (CommonUtilities.IsNeedToConnectToDB(configuration.GetValue<string>("ConnectionStrings"), configuration.GetValue<bool>("SkipDbConnectIfNoConnectionString")))
             {
                 await ClearDataAsync();
             }
@@ -154,34 +138,12 @@ namespace _MicroserviceTemplate_.EF.Tests
         protected DbContextOptionsBuilder<_MicroserviceTemplate_DbContext> CreateContextBuilder()
         {
             var builder = new DbContextOptionsBuilder<_MicroserviceTemplate_DbContext>();
-            if (IsCheckConnectionStringExists())
+            if (CommonUtilities.IsNeedToConnectToDB(configuration.GetValue<string>("ConnectionStrings"), configuration.GetValue<bool>("SkipDbConnectIfNoConnectionString")))
             {
-                string connectionString = configuration.GetValue<string>("ConnectionStrings");
-                if (configuration.GetValue<bool>("InjectDBCredentialFromEnvironment"))
-                {
-                    connectionString +=
-                        $";User Id={configuration.GetValue<string>("AspNetCoreDbUserName")};Password={configuration.GetValue<string>("AspNetCoreDbPassword")}";
-                }
+                string connectionString = CommonUtilities.GetConnectString(configuration, true);
                 builder.UseSqlServer(connectionString);
             }
             return builder;
-        }
-
-        public bool IsCheckConnectionStringExists()
-        {
-            if (configuration.GetValue<bool>("SkipDbTestIfNoConnectionString"))
-            {
-                return false;
-            }
-            else
-            {
-                string connectionString = configuration.GetValue<string>("ConnectionStrings");
-                if (string.IsNullOrWhiteSpace(connectionString))
-                {
-                    return false;
-                }
-                return true;
-            }
         }
     }
 }

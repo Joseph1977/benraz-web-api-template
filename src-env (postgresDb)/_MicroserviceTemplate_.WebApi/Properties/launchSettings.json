@@ -14,6 +14,7 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "AspNetCore_Environment": "Development",
+        "SkipDbConnectIfNoConnectionString": "true",
         "ConnectionStrings": "Host=localhost;Port=5432;SslMode=prefer;Database=Benraz-_MicroserviceTemplate_",
 
         "Audience": "_MicroserviceTemplate_",
@@ -29,7 +30,7 @@
         "SwaggerBasePath": "_microservicetemplate_-server",
         "EnablesApplicationInsights": "false",
 
-        "Region": "USE1",
+        "Region": "USC1",
         "Environment": "DEV",
         "ServiceName": "_microservicetemplate_-server",
         "Service": "MSTS",
