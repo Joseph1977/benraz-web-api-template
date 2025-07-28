@@ -36,7 +36,7 @@ This service follows a layered microservice architecture with a clear separation
     - Uses `#ifdef` to disable authentication during local debugging when no auth server is available.
     - Always build in **Release mode** before committing code.
   - **Environment Configurations**:
-      - See `Environment Configurations (MSDB)` section.
+      - See `Environment Configurations (Mix DB Vendors)` section.
 
   - **Special Controllers**:
     - `JobsController`: 
@@ -74,33 +74,37 @@ This service follows a layered microservice architecture with a clear separation
   - Create unit test case for entity like (add, update, delete, get, get all) using existing structure.
 
 ### [ServiceName].WebApi.IntegrationTests – Integration Tests for Web API
-- Crete unit test case for controller endpoints like (add, update, delete, get, get all) using existing structure.
+- Create unit test case for controller endpoints like (add, update, delete, get, get all) using existing structure.
 
 This template provides three different implementation approaches to help you create a microservice that best fits your deployment and configuration requirements.
 
-## Environment Configurations (`MSDB`)
+## Environment Configurations (`Mix DB Vendors`)
 
-### 1. **Environment Variables Implementation** (`MSDB`)
+### 1. **Environment Variables Implementation** (`Mix DB Vendors`)
 
-**Best for:** Cloud-native apps configured via environment variables in containerized CI/CD workflows.
+**Best for:** Applications that need to support multiple database providers (`SQL Server` and `PostgreSQL`).
 
 **Features:**
-- Entire configuration managed via environment variables (no reliance on `appsettings.json`)
-- Supports `.env` files for different environments and regions
-  - For `non-local` environments, use environment-specific files inside the `.env/` directory
-  - For `local development`, configuration is managed via `launchSettings.json`
-- Secrets and sensitive settings are automatically injected from Cloud Key Vault to environment variables
-- Supports a `MSDB` database provider.
-
-- **Choose:**
-- **`MSDB`** - For **SQL Server** databases using **environment variable-based configuration**
+- Configuration via environment variables (no `appsettings.json` required)
+- Support for both `SQL Server` AND `PostgreSQL`
+- Separate Entity Framework Core projects per database provider to isolate migrations and configurations like:
+  - `[ServiceName].EF.PostgreSql` : For PostgreSql
+  - `[ServiceName].EF.SqlServer` : For SQL Server
+- Uses preprocessor directives (`#if`, `#elif`) to compile conditionally for the target database
+- Use Shared data access layer `[ServiceName].EF.Data`
+- IF `SQLSERVER` environment variable `true` then use `SQL Server` other wise use `PostgreSQL`.
+- Use `DesignTimeDbContextFactory` class for local migration.
+- All implementations support the `SkipDbConnectIfNoConnectionString` option:
+```properties
+SkipDbConnectIfNoConnectionString=true
+```
+When enabled, the service will start without database connectivity if no connection string is provided.
 
 **When to use:**
 - Use this implementation when:
-  - Managing secrets with a Cloud Key Vault or a secure secrets provider
-  - DevOps CI/CD pipelines
-  - Multi-environment deployments (`dev`, `qa`, `staging`, `production`)
-  - When using Cloud Key Vault for secrets management
+  - You're building multi-tenant applications where tenants use different database engines
+  - Applications that need database vendor flexibility at build or deploy time
+  - When client requirements vary by deployment
   
 ---
 
@@ -145,7 +149,7 @@ Use existing projects like:
               - `Response model`:
 		- Must inherit from `HttpResponseBase.cs`
 		- Provides standard HTTP response behavior.
-           - ITargetServiceGateway.cs`:
+           - `ITargetServiceGateway.cs`:
 	     - Interface defining all required API methods for the service.
            - `TargetServiceEndpoints.cs`:
              - Centralized static class defining all API endpoint paths for the service.

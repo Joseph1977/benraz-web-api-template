@@ -36,7 +36,7 @@ This service follows a layered microservice architecture with a clear separation
     - Uses `#ifdef` to disable authentication during local debugging when no auth server is available.
     - Always build in **Release mode** before committing code.
   - **Environment Configurations**:
-      - See `Environment Configurations (postgresDb)` section.
+      - See `Environment Configuration AppSettings` section.
 
   - **Special Controllers**:
     - `JobsController`: 
@@ -74,33 +74,41 @@ This service follows a layered microservice architecture with a clear separation
   - Create unit test case for entity like (add, update, delete, get, get all) using existing structure.
 
 ### [ServiceName].WebApi.IntegrationTests – Integration Tests for Web API
-- Crete unit test case for controller endpoints like (add, update, delete, get, get all) using existing structure.
+- Create unit test case for controller endpoints like (add, update, delete, get, get all) using existing structure.
 
 This template provides three different implementation approaches to help you create a microservice that best fits your deployment and configuration requirements.
 
-## Environment Configurations (`postgresDb`)
+## Environment Configuration AppSettings
 
-### 1. **Environment Variables Implementation** (`postgresDb`)
-**Best for:** Cloud-native deployments with containerization and CI/CD pipelines
+### 1. **AppSettings Implementation**
+**Best for:** Traditional .NET development with JSON configuration files
 
 **Features:**
-- Entire configuration managed via environment variables (no reliance on `appsettings.json`)
-- Supports `.env` files for different environments and regions
-  - For `non-local` environments, use environment-specific files inside the `.env/` directory
-  - For `local` development, configuration is managed via `launchSettings.json`
-- Secrets and sensitive settings are automatically injected from Cloud Key Vault to environment variables
-- Supports a `PostgreSQL` database provider.
+- Uses `appsettings.json` as the base configuration file.
+- Supports multiple environment-specific configuration files:
+  - `appsettings.Development.json`
+  - `appsettings.QA.json`
+  - `appsettings.Sandbox.json`
+  - `appsettings.Production.json`
+- Dynamic Settings via Database:
+  - Secrets and environment-specific settings can be injected from the database from settings table using a custom configuration provider.
+  - A `DatabaseConfigurationProvider` class reads key-value pairs from the Settings table and applies them to the application configuration at runtime.
+  - This allows central management of secrets and overrides without needing to redeploy.
+- Traditional Entity Framework Core setup
+- SQL Server support only
+- All implementations support the `SkipDbConnectIfNoConnectionString` option:
+```properties
+SkipDbConnectIfNoConnectionString=true
+```
+When enabled, the service will start without database connectivity if no connection string is provided.
 
-- **Choose:**
-- **`postgresDb`** - For **PostgreSQL** databases using **environment variable-based configuration**
+**When to Use This Template:**
+- Use this template when:
+  - You prefer managing configuration through JSON files (e.g., appsettings.json, appsettings.[Environment].json)
+  - You need a clear separation of secrets and runtime settings, with optional overrides via the database Settings table
+  - Traditional deployment scenarios
+  - When you need environment-specific appsettings files
 
-**When to use:**
-- Use this implementation when:
-  - Managing secrets with a Cloud Key Vault or a secure secrets provider
-  - DevOps CI/CD pipelines
-  - Multi-environment deployments (`dev`, `qa`, `staging`, `production`)
-  - When using Cloud Key Vault for secrets management
-  
 ---
 
 
@@ -144,7 +152,7 @@ Use existing projects like:
               - `Response model`:
 		- Must inherit from `HttpResponseBase.cs`
 		- Provides standard HTTP response behavior.
-           - ITargetServiceGateway.cs`:
+           - `ITargetServiceGateway.cs`:
 	     - Interface defining all required API methods for the service.
            - `TargetServiceEndpoints.cs`:
              - Centralized static class defining all API endpoint paths for the service.
