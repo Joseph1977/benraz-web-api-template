@@ -26,8 +26,8 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
 		<PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
 		<PackageReference Include="NLog.Web.AspNetCore" Version="5.3.12" />
-		<PackageReference Include="Benraz.Infrastructure.Authorization" Version="1.0.3" />
-		<PackageReference Include="Benraz.Infrastructure.Web" Version="1.0.3" />
+		<PackageReference Include="Benraz.Infrastructure.Authorization" Version="1.0.5" />
+		<PackageReference Include="Benraz.Infrastructure.Web" Version="1.0.4" />
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="8.0.2" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.7.3" />

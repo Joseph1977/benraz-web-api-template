@@ -22,7 +22,7 @@
         "General_LogFolder": "./Logs",
         "Logging_LogLevel_Default": "Information",
         "Logging_LogLevel_Microsoft": "Warning",
-        "Logging_LogLevel_Microsoft.Hosting.Lifetime": "Information",
+        "Logging_LogLevel_Microsoft_Hosting_Lifetime": "Information",
 
         "AllowedHosts": "*",
         "DisableSwagger": "false",
@@ -42,8 +42,7 @@
         "Jwt_Audience": "",
         "Jwt_Authority": "",
 
-        "AspNetCoreDbUserName": "__DB_USERNAME__",
-        "AspNetCoreDbPassword": "__DB_PASSWORD__"
+        "DISABLE_AUTHORIZATION": false
       }
     },
     "_MicroserviceTemplate_.WebApi": {
@@ -79,8 +78,6 @@
         "Jwt_Audience": "",
         "Jwt_Authority": "",
 
-        "AspNetCoreDbUserName": "__DB_USERNAME__",
-        "AspNetCoreDbPassword": "__DB_PASSWORD__"
       },
       "applicationUrl": "http://localhost:57886"
     }
