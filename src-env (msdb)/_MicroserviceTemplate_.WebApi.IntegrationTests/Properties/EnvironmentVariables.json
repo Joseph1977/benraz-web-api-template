@@ -1,0 +1,36 @@
+{
+  "AspNetCore_Environment": "Development",
+  "SkipDbConnectIfNoConnectionString": "true",
+  "ConnectionStrings": "Data Source=(localdb)\\mssqllocaldb;Integrated Security=SSPI;Initial Catalog=Benraz._MicroserviceTemplate_.Test",
+
+  "Audience": "_MicroserviceTemplate_",
+
+  "General_LogFolder": "./Logs",
+  "Logging_LogLevel_Default": "Information",
+  "Logging_LogLevel_Microsoft": "Warning",
+  "Logging_LogLevel_Microsoft.Hosting.Lifetime": "Information",
+
+  "AllowedHosts": "*",
+  "DisableSwagger": "false",
+  "InjectDBCredentialFromEnvironment": "false",
+  "SwaggerBasePath": "_microservicetemplate_-server",
+  "EnablesApplicationInsights": "false",
+
+  "Region": "USC1",
+  "Environment": "DEV",
+  "ServiceName": "_microservicetemplate_-server",
+  "Service": "MSTS",
+
+  "General_AuthorizationBaseUrl": "null",
+  "General_AuthorizationAccessToken": "null",
+  "TokenValidation_Audience": "null",
+
+  "Jwt_Audience": "",
+  "Jwt_Authority": "",
+
+  "AccessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyb2xlIjoidGVzdCJ9.-I0pOAoVASxAkkupXlue8npTy_LBPua_ln_V6Tq_-_8",
+  "BenrazAuthGateway_BaseUrl": "http://localhost:60341",
+
+  "AspNetCoreDbUserName": "__DB_USERNAME__",
+  "AspNetCoreDbPassword": "__DB_PASSWORD__"
+}

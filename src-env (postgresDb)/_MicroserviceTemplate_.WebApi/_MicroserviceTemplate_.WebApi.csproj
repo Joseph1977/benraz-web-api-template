@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DocumentationFile>bin\Debug\net8.0\_MicroserviceTemplate_.WebApi.xml</DocumentationFile>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DocumentationFile>bin\Release\net8.0\_MicroserviceTemplate_.WebApi.xml</DocumentationFile>
+		<DefineConstants>TRACE;EnableAuthorization</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Asp.Versioning.Http" Version="8.1.0" />
+		<PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
+		<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
+		<PackageReference Include="AutoMapper" Version="13.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="5.3.12" />
+		<PackageReference Include="Benraz.Infrastructure.Authorization" Version="1.0.3" />
+		<PackageReference Include="Benraz.Infrastructure.Web" Version="1.0.3" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="8.0.2" />
+		<PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.7.3" />
+		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.7.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\_MicroserviceTemplate_.Domain\_MicroserviceTemplate_.Domain.csproj" />
+		<ProjectReference Include="..\_MicroserviceTemplate_.EF\_MicroserviceTemplate_.EF.csproj" />
+	</ItemGroup>
+
+</Project>
