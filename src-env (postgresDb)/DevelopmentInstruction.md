@@ -31,8 +31,8 @@ This service follows a **Domain-Driven Design (DDD) layered microservice archite
   - **Authorization**:
     - Uses Claim-based policies via `[Authorize(POLICYNAME)]` attribute.
     - Wrapped in `#if EnableAuthorization` / `#endif` preprocessor directives to allow disabling during local debugging.
-    - **Claim naming format**: `{servicename-lowercase}-{controller-action-lowercase}` (e.g., `documentmanager-documents-read`, `duediligence-report-type-add`).
-    - **Policy naming format**: `{controller-action-lowercase}` with hyphens (e.g., `documents-read`, `report-type-add`).
+    - **Claim naming format**: `{servicename}-{controllername}-{action}` — all segments lowercase (e.g., `documentmanager-documents-read`, `prompt-atomicprompts-read`, `duediligence-report-category-add`). Optional additional segments may follow the action (e.g., `documentmanager-documents-read-all`).
+    - **Policy naming format**: `{controllername}-{action}` — all segments lowercase, with hyphens (e.g., `documents-read`, `report-category-add`).
     - **Claim/Policy constant naming**: `UPPER_SNAKE_CASE` (e.g., `DOCUMENTS_READ`, `REPORT_TYPE_ADD`).
     - To add a new endpoint with authorization:
       1. Add the claim constant in `[ServiceName]Claims` class (inside `[ServiceName].Domain/Authorization/`).
@@ -153,6 +153,9 @@ This service follows a **Domain-Driven Design (DDD) layered microservice archite
 - These entities have a full set: entity class, service interface, service implementation, repository interface, and optionally query/filter models.
 - Repository interface inherits from `IRepository<Guid, [Entity]>` (from `Benraz.Infrastructure.Common.Repositories`).
 - Repository implementation inherits from `RepositoryBase<Guid, [Entity], [ServiceName]DbContext>` (from `Benraz.Infrastructure.EF`).
+  - `RepositoryBase` automatically manages timestamps:
+    - `PrepareAdd`: Sets both `CreateTimeUtc` and `UpdateTimeUtc` to `DateTime.UtcNow`.
+    - `PrepareChange` (called by `ChangeAsync`): Sets `UpdateTimeUtc` to `DateTime.UtcNow`.
 
 #### 2. **Lookup/Reference Entities** (Read-Only or Seed-Data Entities)
 - Inherit from `IEntity<TEnum>` (from `Benraz.Infrastructure.Common.EntityBase`) where `TEnum` is an `enum` representing the entity's ID.
@@ -175,9 +178,6 @@ This service follows a **Domain-Driven Design (DDD) layered microservice archite
   - For `local` development, configuration is managed via `launchSettings.json`
 - Secrets and sensitive settings are automatically injected from Cloud Key Vault to environment variables
 - Supports a `PostgreSQL` database provider.
-
-- **Choose:**
-- **`postgresDb`** - For **PostgreSQL** databases using **environment variable-based configuration**
 
 **When to use:**
 - Use this implementation when:
@@ -393,8 +393,9 @@ public async Task GetUser(Guid userId)
   - **`[Entity]Service.cs`**: Service implementation.
      - Implements `I[Entity]Service`.
      - Constructor receives `I[Entity]Repository` and `ILogger<[Entity]Service>` via DI.
-     - In `AddAsync`: Assign `Id = Guid.NewGuid()` before saving.
+     - In `AddAsync`: Assign `Id = Guid.NewGuid()` before saving. (`CreateTimeUtc` and `UpdateTimeUtc` are auto-set by `RepositoryBase.PrepareAdd` — do not set them manually.)
      - In `UpdateAsync`: Use repository's `ChangeAsync` method.
+       > **Note**: `ChangeAsync` (from `RepositoryBase`) internally calls `PrepareChange(entity)` which **automatically sets `UpdateTimeUtc = DateTime.UtcNow`** — do not set it manually in the service or controller.
      - Wrap operations in `try-catch` blocks. In the catch block:
        - Log with `_logger.LogError(ex, "...")`.
        - Throw `new DomainException(message, message)` (from `Benraz.Infrastructure.Common.Exceptions`).
@@ -780,8 +781,8 @@ private bool IsGuidNullOrEmpty(Guid? guid)
    {
        _logger.LogError(ex, "[Entity]Service: Error while [action].");
        throw new DomainException(
-           $"Error while [action]: {ex.Message}",
-           $"Error while [action]: {ex.Message}");
+           $"Error while [action]: {ex.Message}",   // message (internal/developer)
+           $"Error while [action]: {ex.Message}");  // userMessage (user-facing) — same value by convention
    }
    ```
 
